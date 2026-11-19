@@ -1,0 +1,32 @@
+# Byte-compiled / optimized / DLL cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Android build cache / intermediate artifacts
+android_app/build/
+.gradle/
+local.properties
+
+# PyInstaller / Release artifacts
+build_dist/
+build_work/
+installer/redist/
+dist/
+
+# Runtime & local config
+pc_server/config.json
+*.log
+*.tmp
+*.temp
+
+# Signing keys & secrets
+*.keystore
+*.jks
+*.pass
+android_app/pckontrol.keystore
+
+# OS generated files
+Thumbs.db
+[Dd]esktop.ini
+.DS_Store

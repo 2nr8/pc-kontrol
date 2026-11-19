@@ -1,0 +1,3528 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0A0A0B" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>PC</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       Endüstriyel Donanım Tasarım Sistemi (Braun / Teenage Engineering / Linear)
+       Tüm renkler gerçek nötr karbon/grafit; parlak zeminler yasak.
+       ========================================================================== */
+    :root {
+      --bg: #0A0A0B;
+      --surface: #111113;
+      --surface-raised: #18181B;
+      --surface-active: #222226;
+      --border: #222226;
+      --border-subtle: #1C1C1F;
+      --border-control: #2E2E34;
+
+      --ink: #F4F4F5;
+      --ink-muted: #D4D4D8;
+      --ink-dim: #9E9EA6;
+
+      /* Endüstriyel Durum Renkleri */
+      --status-online: #10B981;
+      --status-danger: #EF4444;
+      --status-warn: #F59E0B;
+
+      --radius-sm: 6px;
+      --radius-md: 8px;
+
+      --font-stack: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+    }
+
+    input, select, textarea {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      background-color: var(--bg);
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-stack);
+      font-size: 14px;
+      line-height: 1.45;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: max(16px, env(safe-area-inset-top, 16px));
+      padding-bottom: max(32px, calc(env(safe-area-inset-bottom, 0px) + 24px));
+      padding-left: max(14px, env(safe-area-inset-left, 14px));
+      padding-right: max(14px, env(safe-area-inset-right, 14px));
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* Tabular Rakamlar */
+    .num-tabular,
+    .telemetry-val,
+    .telemetry-sub,
+    .sys-spec,
+    .time-digits,
+    .form-input,
+    .timer-time-display {
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+    }
+
+    /* Ana Taşıyıcı Konsol Düzeni */
+    .console-shell {
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 0 auto;
+      min-width: 0;
+    }
+
+    /* ==========================================================================
+       1. Üst Başlık Şeridi (Top Header Strip)
+       ========================================================================== */
+    .top-header {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .machine-identity {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .machine-identity h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .machine-network-text {
+      font-size: 13px;
+      color: var(--ink-muted);
+      letter-spacing: 0.1px;
+      word-break: break-all;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--status-danger);
+      flex-shrink: 0;
+    }
+
+    .state-online .status-dot {
+      background-color: var(--status-online);
+    }
+
+    .state-waking .status-dot {
+      background-color: var(--status-warn);
+    }
+
+    .ghost-control-btn {
+      height: 36px;
+      min-height: 36px;
+      padding: 0 12px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background-color 140ms ease, border-color 140ms ease;
+    }
+
+    .ghost-control-btn:hover {
+      background: var(--surface-active);
+      border-color: var(--border-control);
+    }
+
+    .ghost-control-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ==========================================================================
+       2. Birleşik Telemetri Şeridi (1px Hairline Bölmeler)
+       ========================================================================== */
+    .telemetry-shelf {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .telemetry-col {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-right: 1px solid var(--border);
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .telemetry-col:last-child {
+      border-right: none;
+    }
+
+    .telemetry-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .telemetry-val {
+      font-size: clamp(20px, 2.2vw, 24px);
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.15;
+      word-break: break-word;
+    }
+
+    .telemetry-bar-wrap {
+      width: 100%;
+      height: 2px;
+      background: var(--surface-active);
+      margin: 4px 0 2px 0;
+      position: relative;
+    }
+
+    .telemetry-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--ink-dim);
+      transition: width 300ms ease, background-color 200ms ease;
+    }
+
+    .telemetry-sub {
+      font-size: 12px;
+      color: var(--ink-dim);
+      white-space: normal;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    /* Sıcaklık Rozetleri (Temp Badge) */
+    .temp-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+      font-variant-numeric: tabular-nums;
+      transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .temp-badge.temp-cool {
+      background: rgba(0, 240, 168, 0.12);
+      color: #00F0A8;
+      border: 1px solid rgba(0, 240, 168, 0.3);
+    }
+
+    .temp-badge.temp-warm {
+      background: rgba(255, 183, 3, 0.12);
+      color: #FFB703;
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+
+    .temp-badge.temp-hot {
+      background: rgba(255, 77, 77, 0.14);
+      color: #FF4D4D;
+      border: 1px solid rgba(255, 77, 77, 0.32);
+    }
+
+    /* Çoklu Disk Gösterimi */
+    .telemetry-val.is-multi {
+      font-size: clamp(14px, 1.6vw, 17px);
+      font-weight: 600;
+      line-height: 1.25;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 2px 6px;
+      word-break: break-word;
+    }
+
+    .disk-chip {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .disk-drive {
+      color: var(--ink-muted);
+      font-size: 0.9em;
+      font-weight: 700;
+    }
+
+    .disk-sep {
+      color: var(--border-control);
+      user-select: none;
+    }
+
+    .telemetry-bar-wrap.is-multi {
+      display: flex;
+      gap: 4px;
+      background: transparent;
+    }
+
+    .telemetry-bar-segment {
+      flex: 1;
+      height: 2px;
+      background: var(--surface-active);
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .telemetry-bar-segment .telemetry-bar-fill {
+      height: 100%;
+      background: var(--ink-dim);
+      transition: width 300ms ease, background-color 200ms ease;
+    }
+
+    .telemetry-sub.is-multi {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px 6px;
+      font-size: 11.5px;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .disk-sub-item {
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       3. Konsol Panelleri Grid (Dengeli Hizalama)
+       ========================================================================== */
+    .console-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    /* Modül Panelleri */
+    .module-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .module-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-meta-tag {
+      font-size: 12px;
+      color: var(--ink-dim);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       4. Birincil Donanım Güç Şalteri & İkincil WoL
+       İç içe kutular kaldırıldı; doğrudan durum bilgisi ve tam genişlikte butonlar.
+       ========================================================================== */
+    .power-direct-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .power-info-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .power-state-heading {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.3;
+      word-break: break-word;
+    }
+
+    .power-state-desc {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    /* ==========================================================================
+       BİRİNCİL GÜÇ BUTONU (.primary-power-btn / .primary-switch-btn / #btn-hero-power)
+       ========================================================================== */
+    .primary-switch-btn,
+    .primary-power-btn,
+    #btn-hero-power {
+      width: 100%;
+      height: 52px;
+      min-height: 52px;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      outline: none;
+      box-sizing: border-box;
+      background-color: #18181B !important;
+      border: 1px solid #2E2E34 !important;
+      color: #F4F4F5 !important;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 100ms ease;
+    }
+
+    .primary-switch-btn:active,
+    .primary-power-btn:active,
+    #btn-hero-power:active {
+      transform: scale(0.98);
+    }
+
+    /* Varsayılan ve Kasa Açıkken Birincil Buton (Kasayı Kapat) */
+    body.state-online #btn-hero-power,
+    body.state-online .primary-power-btn,
+    body.state-online .primary-switch-btn,
+    .switch-mode-shutdown,
+    #btn-hero-power.switch-mode-shutdown {
+      background-color: #18181B !important;
+      border: 1px solid #2E2E34 !important;
+      color: #F4F4F5 !important;
+      font-weight: 700;
+    }
+
+    body.state-online #btn-hero-power svg,
+    body.state-online .primary-power-btn svg,
+    body.state-online .primary-switch-btn svg,
+    .switch-mode-shutdown svg,
+    #btn-hero-power.switch-mode-shutdown svg {
+      stroke: #EF4444 !important;
+      transition: stroke 160ms ease;
+    }
+
+    body.state-online #btn-hero-power:hover,
+    body.state-online .primary-power-btn:hover,
+    body.state-online .primary-switch-btn:hover,
+    .switch-mode-shutdown:hover,
+    #btn-hero-power.switch-mode-shutdown:hover {
+      background-color: #24242B !important;
+      border: 1px solid #EF4444 !important;
+      color: #F4F4F5 !important;
+    }
+
+    body.state-online #btn-hero-power:hover svg,
+    body.state-online .primary-power-btn:hover svg,
+    body.state-online .primary-switch-btn:hover svg,
+    .switch-mode-shutdown:hover svg,
+    #btn-hero-power.switch-mode-shutdown:hover svg {
+      stroke: #EF4444 !important;
+    }
+
+    /* Sadece Kasa Kapalıyken Birincil Buton (Wake-on-LAN) */
+    body.state-offline #btn-hero-power,
+    body.state-offline .primary-power-btn,
+    body.state-offline .primary-switch-btn,
+    body.state-offline .switch-mode-wol,
+    body:not(.state-online) .switch-mode-wol,
+    body:not(.state-online) #btn-hero-power.switch-mode-wol {
+      background-color: #10B981 !important;
+      color: #09090B !important;
+      font-weight: 700;
+      border: 1px solid #10B981 !important;
+    }
+
+    body.state-offline #btn-hero-power svg,
+    body.state-offline .primary-power-btn svg,
+    body.state-offline .primary-switch-btn svg,
+    body.state-offline .switch-mode-wol svg,
+    body:not(.state-online) .switch-mode-wol svg,
+    body:not(.state-online) #btn-hero-power.switch-mode-wol svg {
+      stroke: #09090B !important;
+    }
+
+    body.state-offline #btn-hero-power:hover,
+    body.state-offline .primary-power-btn:hover,
+    body.state-offline .primary-switch-btn:hover,
+    body.state-offline .switch-mode-wol:hover,
+    body:not(.state-online) .switch-mode-wol:hover,
+    body:not(.state-online) #btn-hero-power.switch-mode-wol:hover {
+      background-color: #059669 !important;
+      border-color: #059669 !important;
+      color: #09090B !important;
+    }
+
+    body.state-offline #btn-hero-power:hover svg,
+    body.state-offline .primary-power-btn:hover svg,
+    body.state-offline .primary-switch-btn:hover svg,
+    body.state-offline .switch-mode-wol:hover svg,
+    body:not(.state-online) .switch-mode-wol:hover svg,
+    body:not(.state-online) #btn-hero-power.switch-mode-wol:hover svg {
+      stroke: #09090B !important;
+    }
+
+    /* Uyanıyor Modu */
+    body.state-waking #btn-hero-power,
+    body.state-waking .primary-power-btn,
+    body.state-waking .primary-switch-btn,
+    .switch-mode-waking,
+    #btn-hero-power.switch-mode-waking {
+      background-color: #272015 !important;
+      border: 1px solid #F59E0B !important;
+      color: #FDE68A !important;
+      cursor: wait;
+    }
+
+    body.state-waking #btn-hero-power svg,
+    body.state-waking .primary-power-btn svg,
+    body.state-waking .primary-switch-btn svg,
+    .switch-mode-waking svg,
+    #btn-hero-power.switch-mode-waking svg {
+      stroke: #FDE68A !important;
+    }
+
+    /* Onay Durumu (Kasa Açıkken Onay Beklerken) */
+    body.state-online #btn-hero-power.is-armed,
+    body.state-online #btn-hero-power.switch-mode-confirm,
+    body.state-online .primary-power-btn.is-armed,
+    body.state-online .primary-power-btn.switch-mode-confirm,
+    body.state-online .primary-switch-btn.is-armed,
+    body.state-online .primary-switch-btn.switch-mode-confirm,
+    #btn-hero-power.is-armed,
+    #btn-hero-power.switch-mode-confirm,
+    .switch-mode-confirm,
+    .is-armed#btn-hero-power {
+      background-color: #DC2626 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #DC2626 !important;
+    }
+
+    body.state-online #btn-hero-power.is-armed svg,
+    body.state-online #btn-hero-power.switch-mode-confirm svg,
+    body.state-online .primary-power-btn.is-armed svg,
+    body.state-online .primary-power-btn.switch-mode-confirm svg,
+    body.state-online .primary-switch-btn.is-armed svg,
+    body.state-online .primary-switch-btn.switch-mode-confirm svg,
+    #btn-hero-power.is-armed svg,
+    #btn-hero-power.switch-mode-confirm svg,
+    .switch-mode-confirm svg,
+    .is-armed#btn-hero-power svg {
+      stroke: #FFFFFF !important;
+    }
+
+    body.state-online #btn-hero-power.is-armed:hover,
+    body.state-online #btn-hero-power.switch-mode-confirm:hover,
+    #btn-hero-power.is-armed:hover,
+    #btn-hero-power.switch-mode-confirm:hover,
+    .switch-mode-confirm:hover {
+      background-color: #B91C1C !important;
+      border-color: #B91C1C !important;
+      color: #FFFFFF !important;
+    }
+
+    body.state-online #btn-hero-power.is-armed:hover svg,
+    body.state-online #btn-hero-power.switch-mode-confirm:hover svg,
+    #btn-hero-power.is-armed:hover svg,
+    #btn-hero-power.switch-mode-confirm:hover svg,
+    .switch-mode-confirm:hover svg {
+      stroke: #FFFFFF !important;
+    }
+
+    /* Tam Genişlikte İkincil WoL Butonu */
+    .secondary-switch-btn {
+      width: 100%;
+      height: 42px;
+      min-height: 42px;
+      padding: 0 16px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      outline: none;
+      box-sizing: border-box;
+      transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease, transform 100ms ease;
+    }
+
+    .secondary-switch-btn:hover {
+      background: var(--surface-active);
+      color: var(--ink);
+      border-color: var(--border-control);
+    }
+
+    .secondary-switch-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ==========================================================================
+       5. Dörtlü Sistem Komutları (Monokrom Endüstriyel Tuşlar)
+       ========================================================================== */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .action-tactile-btn {
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      min-height: 64px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      text-align: left;
+      outline: none;
+      min-width: 0;
+      width: 100%;
+      box-sizing: border-box;
+      transition: background-color 140ms ease, border-color 140ms ease;
+    }
+
+    .action-tactile-btn:hover {
+      background: var(--surface-active);
+      border-color: var(--border-control);
+    }
+
+    .action-tactile-btn:active {
+      transform: scale(0.98);
+    }
+
+    .action-btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .action-btn-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    .action-btn-sub {
+      font-size: 11px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    /* 2 Aşamalı Onay Durumu */
+    .action-tactile-btn.arming-danger {
+      background: var(--status-danger) !important;
+      border-color: var(--status-danger) !important;
+    }
+
+    .action-tactile-btn.arming-danger .action-btn-name,
+    .action-tactile-btn.arming-danger .action-btn-sub,
+    .action-tactile-btn.arming-danger svg {
+      color: #FFFFFF !important;
+    }
+
+    .action-tactile-btn.arming-warn {
+      background: var(--status-warn) !important;
+      border-color: var(--status-warn) !important;
+    }
+
+    .action-tactile-btn.arming-warn .action-btn-name,
+    .action-tactile-btn.arming-warn .action-btn-sub,
+    .action-tactile-btn.arming-warn svg {
+      color: #0A0A0B !important;
+    }
+
+    /* ==========================================================================
+       6. Otomatik Kapanma (Zamanlayıcı) Modülü
+       ========================================================================== */
+    .timer-active-banner {
+      background: var(--surface-raised);
+      border: 1px solid var(--status-warn);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .timer-info-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .timer-info-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--status-warn);
+    }
+
+    .timer-time-display {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .timer-cancel-btn {
+      height: 36px;
+      min-height: 36px;
+      padding: 0 12px;
+      background: var(--surface-active);
+      border: 1px solid var(--border-control);
+      border-radius: var(--radius-sm);
+      color: var(--status-danger);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .timer-cancel-btn:hover {
+      background: #2B1D20;
+    }
+
+    .timer-cancel-btn:active {
+      transform: scale(0.98);
+    }
+
+    .timer-presets-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .preset-pill-btn {
+      height: 38px;
+      min-height: 38px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      box-sizing: border-box;
+      transition: background-color 140ms ease, border-color 140ms ease;
+    }
+
+    .preset-pill-btn:hover {
+      background: var(--surface-active);
+      border-color: var(--border-control);
+    }
+
+    .preset-pill-btn:active {
+      transform: scale(0.98);
+    }
+
+    .timer-custom-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .custom-minute-input {
+      flex: 1;
+      min-width: 0;
+      height: 38px;
+      min-height: 38px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 140ms ease;
+    }
+
+    .custom-minute-input:focus {
+      border-color: var(--ink-dim);
+    }
+
+    .timer-start-btn {
+      height: 38px;
+      min-height: 38px;
+      padding: 0 16px;
+      background: var(--surface-active);
+      border: 1px solid var(--border-control);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color 140ms ease;
+    }
+
+    .timer-start-btn:hover {
+      background: #2E2E36;
+    }
+
+    .timer-start-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ==========================================================================
+       7. Android APK & Bağlantı Modülü
+       ========================================================================== */
+    .apk-module-body {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .apk-guide-text {
+      font-size: 13px;
+      color: var(--ink-muted);
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .apk-buttons-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .apk-solid-btn {
+      height: 38px;
+      min-height: 38px;
+      padding: 0 16px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border-control);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-sizing: border-box;
+      white-space: nowrap;
+      transition: background-color 140ms ease;
+    }
+
+    .apk-solid-btn:hover {
+      background: var(--surface-active);
+    }
+
+    .apk-solid-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* ==========================================================================
+       8. Modallar ve Toast Bildirimi
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .modal-dialog {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      width: 100%;
+      max-width: 440px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-sizing: border-box;
+    }
+
+    .modal-dialog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .modal-dialog-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--ink-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+    }
+
+    .modal-close-btn:hover {
+      color: var(--ink);
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-muted);
+    }
+
+    .form-input {
+      height: 38px;
+      min-height: 38px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 140ms ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--ink-dim);
+    }
+
+    .modal-actions-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .modal-btn-sec {
+      flex: 1;
+      height: 38px;
+      min-height: 38px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-btn-pri {
+      flex: 1;
+      height: 38px;
+      min-height: 38px;
+      background: var(--surface-active);
+      border: 1px solid var(--border-control);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Ağdaki Bilgisayarı Otomatik Bul Butonu */
+    .btn-discovery {
+      width: 100%;
+      height: 42px;
+      min-height: 42px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: var(--radius-sm);
+      color: #34D399;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      margin-bottom: 14px;
+      transition: background-color 140ms ease, border-color 140ms ease, transform 80ms ease, color 140ms ease;
+    }
+
+    .btn-discovery:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.6);
+      color: #6EE7B7;
+    }
+
+    .btn-discovery:active {
+      transform: scale(0.985);
+      background: rgba(16, 185, 129, 0.22);
+    }
+
+    .btn-discovery.is-loading {
+      opacity: 0.75;
+      pointer-events: none;
+    }
+
+    .btn-discovery.is-loading svg {
+      animation: spin-discovery 1s linear infinite;
+    }
+
+    @keyframes spin-discovery {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* QR Gösterim Kutusu */
+    .qr-modal-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 8px 0;
+    }
+
+    .qr-surface-white {
+      width: 190px;
+      height: 190px;
+      background: #FFFFFF;
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qr-url-row {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .qr-url-display {
+      flex: 1;
+      min-width: 0;
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      word-break: break-all;
+      text-align: left;
+      background: var(--surface-raised);
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      box-sizing: border-box;
+      cursor: pointer;
+      user-select: text;
+      -webkit-user-select: text;
+      display: flex;
+      align-items: center;
+      transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+    }
+
+    .qr-url-display:hover {
+      background: var(--surface-active);
+      border-color: var(--border-control);
+      color: var(--ink);
+    }
+
+    .qr-copy-btn {
+      min-height: 38px;
+      padding: 0 12px;
+      background: var(--surface-raised);
+      border: 1px solid var(--border-control);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 80ms ease;
+    }
+
+    .qr-copy-btn:hover {
+      background: var(--surface-active);
+      border-color: var(--ink-dim);
+    }
+
+    .qr-copy-btn:active {
+      transform: scale(0.98);
+    }
+
+    .qr-copy-btn.is-copied {
+      border-color: var(--status-online);
+      color: var(--status-online);
+    }
+
+    /* Toast */
+    .toast-strip {
+      position: fixed;
+      bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+      left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--surface-raised);
+      border: 1px solid var(--border-control);
+      color: var(--ink);
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1100;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 180ms ease, opacity 180ms ease;
+      max-width: 90vw;
+      box-sizing: border-box;
+    }
+
+    .toast-strip.is-visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ==========================================================================
+       9. Mobil & Tablet Responsive Kuralları (820px Breakpoint)
+       ========================================================================== */
+    @media (max-width: 820px) {
+      .telemetry-shelf {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .telemetry-col {
+        border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .telemetry-col:nth-child(2n) {
+        border-right: none;
+      }
+      .telemetry-col:nth-child(5) {
+        grid-column: span 2;
+        border-right: none;
+        border-bottom: none;
+      }
+      .console-cards-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding-left: max(12px, env(safe-area-inset-left, 12px));
+        padding-right: max(12px, env(safe-area-inset-right, 12px));
+      }
+      .telemetry-col {
+        padding: 14px 14px;
+      }
+      .telemetry-val {
+        font-size: 20px;
+      }
+      .module-panel {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .top-header {
+        padding: 12px 14px;
+        gap: 12px;
+      }
+      .machine-identity {
+        flex-direction: column;
+        gap: 3px;
+      }
+      .top-controls {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+      .timer-presets-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .apk-solid-btn {
+        flex: 1 1 calc(50% - 5px);
+        padding: 0 12px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .actions-grid {
+        gap: 8px;
+      }
+      .action-tactile-btn {
+        padding: 10px 8px;
+      }
+      .apk-solid-btn {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body class="state-offline">
+
+  <div class="console-shell">
+
+    <!-- 1. Üst Başlık Şeridi -->
+    <header class="top-header" id="header-bar">
+      <div class="machine-identity">
+        <h1 id="text-hostname">PC Kontrol</h1>
+        <div class="machine-network-text num-tabular">
+          <span id="label-ip">--</span> · <span id="label-mac">--</span>
+        </div>
+      </div>
+
+      <div class="top-controls">
+        <div class="status-badge" id="badge-status-wrap">
+          <span class="status-dot" id="dot-status-indicator"></span>
+          <span id="text-status-state">Kapalı</span>
+        </div>
+
+        <!-- Android APK İndirme Butonu -->
+        <a href="/download/PC.apk" class="ghost-control-btn" id="btn-top-apk" title="Android APK İndir" download="PC.apk">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>APK</span>
+        </a>
+
+        <!-- Ağ Ayarları Butonu -->
+        <button type="button" class="ghost-control-btn" id="btn-open-settings" aria-label="Ağ Ayarları">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Ayarlar</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Birleşik Telemetri Şeridi (1px Hairline Bölmeler) -->
+    <section class="telemetry-shelf" aria-label="Sistem Telemetrisi">
+      <!-- CPU -->
+      <div class="telemetry-col" id="col-cpu">
+        <span class="telemetry-label">İşlemci</span>
+        <div class="telemetry-val" id="stat-cpu-percent">--%</div>
+        <div class="telemetry-bar-wrap">
+          <div class="telemetry-bar-fill" id="bar-cpu"></div>
+        </div>
+        <div class="telemetry-sub" id="stat-cpu-spec">
+          <span class="temp-badge" id="badge-cpu-temp" style="display: none;">--°C</span>
+          <span id="text-cpu-spec">-- Çekirdek · -- GHz</span>
+        </div>
+      </div>
+
+      <!-- Ekran Kartı (GPU) -->
+      <div class="telemetry-col" id="col-gpu">
+        <span class="telemetry-label">Ekran Kartı</span>
+        <div class="telemetry-val" id="stat-gpu-percent">--%</div>
+        <div class="telemetry-bar-wrap">
+          <div class="telemetry-bar-fill" id="bar-gpu"></div>
+        </div>
+        <div class="telemetry-sub" id="stat-gpu-spec">
+          <span class="temp-badge" id="badge-gpu-temp" style="display: none;">--°C</span>
+          <span id="text-gpu-spec">-- · -- GB</span>
+        </div>
+      </div>
+
+      <!-- Bellek -->
+      <div class="telemetry-col" id="col-ram">
+        <span class="telemetry-label">Bellek</span>
+        <div class="telemetry-val" id="stat-ram-percent">--%</div>
+        <div class="telemetry-bar-wrap">
+          <div class="telemetry-bar-fill" id="bar-ram"></div>
+        </div>
+        <div class="telemetry-sub" id="stat-ram-spec">-- / -- GB</div>
+      </div>
+
+      <!-- Depolama -->
+      <div class="telemetry-col" id="col-disk">
+        <span class="telemetry-label" id="stat-disk-label">Depolama</span>
+        <div class="telemetry-val" id="stat-disk-percent">--%</div>
+        <div class="telemetry-bar-wrap" id="bar-disk-wrap">
+          <div class="telemetry-bar-fill" id="bar-disk"></div>
+        </div>
+        <div class="telemetry-sub" id="stat-disk-spec">-- / -- GB</div>
+      </div>
+
+      <!-- Çalışma Süresi -->
+      <div class="telemetry-col" id="col-uptime">
+        <span class="telemetry-label">Açık Kalma</span>
+        <div class="telemetry-val" id="stat-uptime-val">--</div>
+        <div class="telemetry-bar-wrap">
+          <div class="telemetry-bar-fill" id="bar-uptime" style="width: 100%;"></div>
+        </div>
+        <div class="telemetry-sub" id="stat-port-spec">Port 8765 · Dinleniyor</div>
+      </div>
+    </section>
+
+    <!-- 3. Konsol Panelleri (2x2 Grid) -->
+    <main class="console-cards-grid">
+
+      <!-- 1. Satır Sol Kart: Donanım Güç Anahtarı (İç Kutu Kaldırıldı) -->
+      <section class="module-panel">
+        <div class="module-header">
+          <h2 class="module-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+            Donanım Güç Anahtarı
+          </h2>
+          <span class="module-meta-tag" id="label-system-substate">Güç Kontrolü</span>
+        </div>
+
+        <div class="power-direct-block">
+          <div class="power-info-group">
+            <div class="power-state-heading" id="power-info-heading">Kasa Kapalı — WoL Hazır</div>
+            <div class="power-state-desc" id="power-info-desc">Uzaktan çalıştırma sinyali (Magic Packet) göndermek için tuşa basın.</div>
+          </div>
+
+          <!-- Birincil Güç Butonu -->
+          <button type="button" class="primary-switch-btn primary-power-btn switch-mode-wol" id="btn-hero-power">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+              <line x1="12" y1="2" x2="12" y2="12"></line>
+            </svg>
+            <span id="hero-btn-label">Kasayı Aç</span>
+          </button>
+
+          <!-- İkincil WoL Butonu -->
+          <button type="button" class="secondary-switch-btn" id="btn-secondary-wol">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>WoL Sinyali Gönder</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 1. Satır Sağ Kart: Otomatik Zamanlayıcı -->
+      <section class="module-panel">
+        <div class="module-header">
+          <h2 class="module-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Zamanlı Kapatma
+          </h2>
+          <span class="module-meta-tag">Zamanlayıcı</span>
+        </div>
+
+        <!-- Aktif Zamanlayıcı Şeridi -->
+        <div class="timer-active-banner" id="banner-timer-active">
+          <div class="timer-info-group">
+            <div class="timer-info-title">Otomatik Kapanma Devrede</div>
+            <div class="timer-time-display num-tabular" id="text-timer-countdown">00:00:00 kaldı</div>
+          </div>
+          <button type="button" class="timer-cancel-btn" id="btn-cancel-timer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>İptal Et</span>
+          </button>
+        </div>
+
+        <!-- Hızlı Seçim Butonları -->
+        <div class="timer-presets-row">
+          <button type="button" class="preset-pill-btn num-tabular" data-min="15">15 dk</button>
+          <button type="button" class="preset-pill-btn num-tabular" data-min="30">30 dk</button>
+          <button type="button" class="preset-pill-btn num-tabular" data-min="60">1 Saat</button>
+          <button type="button" class="preset-pill-btn num-tabular" data-min="120">2 Saat</button>
+        </div>
+
+        <!-- Özel Dakika Girişi -->
+        <div class="timer-custom-group">
+          <input type="number" id="input-custom-minutes" class="custom-minute-input num-tabular" placeholder="Özel dakika (örn: 45)" min="1" max="1440" />
+          <button type="button" class="timer-start-btn" id="btn-start-timer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Başlat</span>
+          </button>
+        </div>
+
+        <div style="font-size: 13px; color: var(--ink-dim); line-height: 1.4;">
+          Süre bitiminde işletim sistemi güvenli kapatma komutu (shutdown /s /t 0) yürütülür.
+        </div>
+      </section>
+
+      <!-- 2. Satır Sol Kart: Sistem Komutları (4 Farklı İşlev) -->
+      <section class="module-panel">
+        <div class="module-header">
+          <h2 class="module-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            Sistem Komutları
+          </h2>
+          <span class="module-meta-tag">Hızlı İşlemler</span>
+        </div>
+
+        <div class="actions-grid">
+          <!-- 1. Yeniden Başlat -->
+          <button type="button" class="action-tactile-btn" id="btn-cmd-restart">
+            <div class="action-btn-row">
+              <span class="action-btn-name">Yeniden Başlat</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+              </svg>
+            </div>
+            <span class="action-btn-sub">Sistemi Yenile</span>
+          </button>
+
+          <!-- 2. Uyku Modu -->
+          <button type="button" class="action-tactile-btn" id="btn-cmd-sleep">
+            <div class="action-btn-row">
+              <span class="action-btn-name">Uyku Modu</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </div>
+            <span class="action-btn-sub">Askıya Al</span>
+          </button>
+
+          <!-- 3. Ekranı Kilitle -->
+          <button type="button" class="action-tactile-btn" id="btn-cmd-lock">
+            <div class="action-btn-row">
+              <span class="action-btn-name">Ekranı Kilitle</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </div>
+            <span class="action-btn-sub">Oturumu Kilitle</span>
+          </button>
+
+          <!-- 4. Kasayı Aç (WoL) -->
+          <button type="button" class="action-tactile-btn" id="btn-cmd-wol">
+            <div class="action-btn-row">
+              <span class="action-btn-name">Kasayı Aç (WoL)</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <span class="action-btn-sub">Magic Packet Gönder</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 2. Satır Sağ Kart: Android Mobil Entegrasyon & QR -->
+      <section class="module-panel" id="panel-apk-section">
+        <div class="module-header">
+          <h2 class="module-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+              <line x1="12" y1="18" x2="12.01" y2="18"></line>
+            </svg>
+            Android Mobil Uygulaması
+          </h2>
+          <span class="module-meta-tag">v2.0</span>
+        </div>
+
+        <div class="apk-module-body">
+          <p class="apk-guide-text">
+            Aynı yerel ağdayken kasanızı telefonunuzdan tek dokunuşla başlatmak için APK dosyasını yükleyin veya kameranızla QR kodu tarayın.
+          </p>
+
+          <div class="apk-buttons-row">
+            <button type="button" class="apk-solid-btn" id="btn-show-qr">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>QR Kod Göster</span>
+            </button>
+
+            <a href="/download/PC.apk" class="apk-solid-btn" id="btn-direct-apk" download="PC.apk">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              <span>APK İndir</span>
+            </a>
+          </div>
+
+          <div style="font-size: 13px; color: var(--ink-dim); line-height: 1.4;">
+            Yerel ağ yayını UDP Port 9 üzerinden 16 tekrarlı MAC bloğuyla iletilir.
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ==========================================================================
+       Ağ ve Donanım Yapılandırma Modalı
+       ========================================================================== -->
+  <div class="modal-backdrop" id="modal-settings">
+    <div class="modal-dialog">
+      <div class="modal-dialog-header">
+        <div class="modal-dialog-title">Bağlantı & Donanım Yapılandırması</div>
+        <button type="button" class="modal-close-btn" id="btn-close-settings" aria-label="Kapat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <button type="button" class="btn-discovery" id="btn-auto-discover">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span id="txt-auto-discover">Ağdaki Bilgisayarı Otomatik Bul</span>
+      </button>
+
+      <div class="form-field">
+        <label class="form-label" for="cfg-device-name">Cihaz Adı (Boş = Otomatik)</label>
+        <input type="text" id="cfg-device-name" class="form-input" maxlength="64" placeholder="Otomatik" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="cfg-pc-ip">Kasa Yerel IPv4 Adresi</label>
+        <input type="text" id="cfg-pc-ip" class="form-input num-tabular" placeholder="Örn: 192.168.1.50" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="cfg-pc-port">HTTP API Portu</label>
+        <input type="number" id="cfg-pc-port" class="form-input num-tabular" placeholder="8765" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="cfg-pc-mac">Anakart MAC Adresi (WoL Hedefi)</label>
+        <input type="text" id="cfg-pc-mac" class="form-input num-tabular" placeholder="AA-BB-CC-DD-EE-FF" />
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="cfg-pc-broadcast">Ağ Broadcast Adresi</label>
+        <input type="text" id="cfg-pc-broadcast" class="form-input num-tabular" placeholder="192.168.1.255" />
+      </div>
+
+      <div class="modal-actions-row">
+        <button type="button" class="modal-btn-sec" id="btn-reset-settings">Varsayılana Dön</button>
+        <button type="button" class="modal-btn-pri" id="btn-save-settings">Ayarları Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Kod Modalı -->
+  <div class="modal-backdrop" id="modal-qr">
+    <div class="modal-dialog">
+      <div class="modal-dialog-header">
+        <div class="modal-dialog-title">Kamera ile APK İndir</div>
+        <button type="button" class="modal-close-btn" id="btn-close-qr" aria-label="Kapat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="qr-modal-center">
+        <div class="qr-surface-white" id="qr-code-box">
+          <!-- Dinamik SVG QR Matrisi -->
+        </div>
+        <div class="qr-url-row">
+          <div class="qr-url-display num-tabular" id="qr-target-url" title="Kopyalamak için tıklayın">Bağlantı bekleniyor...</div>
+          <button type="button" class="qr-copy-btn" id="btn-copy-qr-url" aria-label="URL'yi Kopyala" title="URL'yi Kopyala">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="txt-copy-qr-url">Kopyala</span>
+          </button>
+        </div>
+        <div style="font-size: 13px; color: var(--ink-dim); text-align: center;">
+          Telefonunuzun kamera uygulamasıyla okutarak doğrudan yükleme yapabilirsiniz.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Bildirimi -->
+  <div class="toast-strip" id="toast-bar">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
+    <span id="toast-text">Sistem bildirimi</span>
+  </div>
+
+  <!-- ==========================================================================
+       JavaScript Kontrol Çekirdeği
+       ========================================================================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      // 1. Ortam & Yapılandırma Yönetimi
+      const isAndroidApp = typeof window.AndroidBridge !== "undefined";
+      const isHttp = window.location.protocol.startsWith("http");
+
+      function isLoopbackHost(host) {
+        if (!host) return true;
+        const h = String(host).trim().toLowerCase();
+        return h === "localhost" || h === "127.0.0.1" || h === "::1" || h === "[::1]" || h === "0.0.0.0";
+      }
+
+      const locationHost = isHttp ? window.location.hostname : "";
+      const DEFAULT_CONFIG = {
+        pcIp: (isHttp && !isLoopbackHost(locationHost)) ? locationHost : "",
+        pcPort: (isHttp && parseInt(window.location.port, 10)) || 8765,
+        pcMac: "",
+        broadcastIp: "255.255.255.255",
+        customDeviceName: "",
+        lastDeviceName: ""
+      };
+
+      const STORAGE_KEY = "pc_power_control_cfg_v1";
+
+      function normalizeDeviceName(val) {
+        return typeof val === "string" ? val.trim().slice(0, 64) : "";
+      }
+
+      function loadConfig() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+              const merged = Object.assign({}, DEFAULT_CONFIG, parsed);
+              const rawIp = typeof merged.pcIp === "string" ? merged.pcIp.trim() : "";
+              merged.pcIp = (rawIp && !isLoopbackHost(rawIp)) ? rawIp : DEFAULT_CONFIG.pcIp;
+              const parsedPort = parseInt(merged.pcPort, 10);
+              merged.pcPort = (parsedPort >= 1 && parsedPort <= 65535) ? parsedPort : DEFAULT_CONFIG.pcPort;
+              merged.pcMac = typeof merged.pcMac === "string" ? merged.pcMac.trim() : DEFAULT_CONFIG.pcMac;
+              const rawBroadcast = typeof merged.broadcastIp === "string" ? merged.broadcastIp.trim() : "";
+              merged.broadcastIp = rawBroadcast || DEFAULT_CONFIG.broadcastIp;
+              merged.customDeviceName = normalizeDeviceName(merged.customDeviceName);
+              merged.lastDeviceName = normalizeDeviceName(merged.lastDeviceName);
+              return merged;
+            }
+          }
+        } catch (e) {
+          console.warn("Yapılandırma yükleme hatası:", e);
+        }
+        return Object.assign({}, DEFAULT_CONFIG);
+      }
+
+      function saveConfig(cfg) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+        } catch (e) {
+          console.error("Yapılandırma kaydetme hatası:", e);
+        }
+      }
+
+      let appConfig = loadConfig();
+
+      function getApiBase() {
+        if (isHttp && window.location.origin && !window.location.origin.startsWith("file://") && window.location.origin !== "null") {
+          return window.location.origin;
+        }
+        const ip = appConfig && typeof appConfig.pcIp === "string" ? appConfig.pcIp.trim() : "";
+        if (!ip) {
+          return "";
+        }
+        const port = (appConfig && appConfig.pcPort) || 8765;
+        return "http://" + ip + ":" + port;
+      }
+
+      // 2. Durum Değişkenleri
+      let isPcOnline = false;
+      let isWakingUp = false;
+      let wakingTimer = null;
+      let wakingSecondsRemaining = 0;
+      let lastTelemetryData = null;
+      let pollIntervalTimer = null;
+      let countdownTimerInterval = null;
+      let activeShutdownTargetTs = null;
+      let powerTransitionTimers = [];
+      let powerTransitionUntil = 0;
+      let powerTransitionLabel = "";
+
+      let armingButton = null;
+      let armingTimer = null;
+      let heroArmTimer = null;
+      let shutdownRequestPending = false;
+
+      // 3. DOM Elemanları
+      const elTextHostname = document.getElementById("text-hostname");
+      const elLabelIp = document.getElementById("label-ip");
+      const elLabelMac = document.getElementById("label-mac");
+      const elBadgeStatusWrap = document.getElementById("badge-status-wrap");
+      const elTextStatusState = document.getElementById("text-status-state");
+
+      const elLabelSystemSubstate = document.getElementById("label-system-substate");
+      const elPowerInfoHeading = document.getElementById("power-info-heading");
+      const elPowerInfoDesc = document.getElementById("power-info-desc");
+      const elBtnHeroPower = document.getElementById("btn-hero-power");
+      const elHeroBtnLabel = document.getElementById("hero-btn-label");
+      const elBtnSecondaryWol = document.getElementById("btn-secondary-wol");
+
+      const elBtnRestart = document.getElementById("btn-cmd-restart");
+      const elBtnSleep = document.getElementById("btn-cmd-sleep");
+      const elBtnLock = document.getElementById("btn-cmd-lock");
+      const elBtnCmdWol = document.getElementById("btn-cmd-wol");
+
+      const elBannerTimerActive = document.getElementById("banner-timer-active");
+      const elTextTimerCountdown = document.getElementById("text-timer-countdown");
+      const elBtnCancelTimer = document.getElementById("btn-cancel-timer");
+      const elInputCustomMinutes = document.getElementById("input-custom-minutes");
+      const elBtnStartTimer = document.getElementById("btn-start-timer");
+
+      const elStatCpuPercent = document.getElementById("stat-cpu-percent");
+      const elBarCpu = document.getElementById("bar-cpu");
+      const elStatCpuSpec = document.getElementById("stat-cpu-spec");
+      const elBadgeCpuTemp = document.getElementById("badge-cpu-temp");
+      const elTextCpuSpec = document.getElementById("text-cpu-spec");
+
+      const elStatGpuPercent = document.getElementById("stat-gpu-percent");
+      const elBarGpu = document.getElementById("bar-gpu");
+      const elStatGpuSpec = document.getElementById("stat-gpu-spec");
+      const elBadgeGpuTemp = document.getElementById("badge-gpu-temp");
+      const elTextGpuSpec = document.getElementById("text-gpu-spec");
+
+      const elStatRamPercent = document.getElementById("stat-ram-percent");
+      const elBarRam = document.getElementById("bar-ram");
+      const elStatRamSpec = document.getElementById("stat-ram-spec");
+
+      const elStatDiskLabel = document.getElementById("stat-disk-label");
+      const elStatDiskPercent = document.getElementById("stat-disk-percent");
+      const elBarDiskWrap = document.getElementById("bar-disk-wrap");
+      const elBarDisk = document.getElementById("bar-disk");
+      const elStatDiskSpec = document.getElementById("stat-disk-spec");
+
+      const elStatUptimeVal = document.getElementById("stat-uptime-val");
+      const elStatPortSpec = document.getElementById("stat-port-spec");
+
+      const elPanelApkSection = document.getElementById("panel-apk-section");
+      const elBtnTopApk = document.getElementById("btn-top-apk");
+
+      const elModalSettings = document.getElementById("modal-settings");
+      const elBtnOpenSettings = document.getElementById("btn-open-settings");
+      const elBtnCloseSettings = document.getElementById("btn-close-settings");
+      const elBtnSaveSettings = document.getElementById("btn-save-settings");
+      const elBtnResetSettings = document.getElementById("btn-reset-settings");
+      const elBtnAutoDiscover = document.getElementById("btn-auto-discover");
+      const elTxtAutoDiscover = document.getElementById("txt-auto-discover");
+
+      const elCfgDeviceName = document.getElementById("cfg-device-name");
+      const elCfgPcIp = document.getElementById("cfg-pc-ip");
+      const elCfgPcPort = document.getElementById("cfg-pc-port");
+      const elCfgPcMac = document.getElementById("cfg-pc-mac");
+      const elCfgPcBroadcast = document.getElementById("cfg-pc-broadcast");
+
+      const elModalQr = document.getElementById("modal-qr");
+      const elBtnShowQr = document.getElementById("btn-show-qr");
+      const elBtnCloseQr = document.getElementById("btn-close-qr");
+      const elQrCodeBox = document.getElementById("qr-code-box");
+      const elQrTargetUrl = document.getElementById("qr-target-url");
+      const elBtnCopyQrUrl = document.getElementById("btn-copy-qr-url");
+      const elTxtCopyQrUrl = document.getElementById("txt-copy-qr-url");
+      let copyQrTimer = null;
+
+      const elToastBar = document.getElementById("toast-bar");
+      const elToastText = document.getElementById("toast-text");
+      let toastTimer = null;
+
+      if (isAndroidApp) {
+        if (elPanelApkSection) elPanelApkSection.style.display = "none";
+        if (elBtnTopApk) elBtnTopApk.style.display = "none";
+      }
+
+      // 4. Titreşim & Bildirim
+      function triggerHaptic(duration) {
+        try {
+          if (window.AndroidBridge && typeof window.AndroidBridge.vibrate === "function") {
+            const ms = Array.isArray(duration) ? duration[0] : (duration || 50);
+            window.AndroidBridge.vibrate(ms);
+          } else if (navigator.vibrate) {
+            navigator.vibrate(duration || 50);
+          }
+        } catch (e) {}
+      }
+
+      function showToast(msg, isErr) {
+        if (!elToastBar) return;
+        elToastText.textContent = msg;
+        elToastBar.style.borderColor = isErr ? "var(--status-danger)" : "var(--border-control)";
+        elToastBar.classList.add("is-visible");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          elToastBar.classList.remove("is-visible");
+        }, 3400);
+      }
+
+      /** Ağ etiketlerini (#label-ip, #label-mac) günceller; boş değerlerde "--" gösterir. */
+      function updateNetworkLabels(ipOverride, macOverride) {
+        const ipVal = (typeof ipOverride === "string" && ipOverride.trim() && !isLoopbackHost(ipOverride))
+          ? ipOverride.trim()
+          : (appConfig && typeof appConfig.pcIp === "string" ? appConfig.pcIp.trim() : "");
+        const macVal = (typeof macOverride === "string" && macOverride.trim())
+          ? macOverride.trim()
+          : (appConfig && typeof appConfig.pcMac === "string" ? appConfig.pcMac.trim() : "");
+        if (elLabelIp) elLabelIp.textContent = ipVal || "--";
+        if (elLabelMac) elLabelMac.textContent = macVal || "--";
+      }
+
+      /** Cihaz adı başlığını ve Windows bilgisayar adı ipucunu günceller. */
+      function applyDeviceNameDisplay(displayName, systemHostname) {
+        const finalName = (typeof displayName === "string" ? displayName.trim() : "") || appConfig.customDeviceName || appConfig.lastDeviceName || "PC Kontrol";
+        if (!elTextHostname) return;
+        elTextHostname.textContent = finalName;
+        const sysHost = typeof systemHostname === "string" ? systemHostname.trim() : "";
+        if (sysHost && sysHost !== finalName) {
+          elTextHostname.title = "Windows Adı: " + sysHost;
+        } else {
+          elTextHostname.removeAttribute("title");
+        }
+      }
+
+      /** Sunucu/keşif yükünden cihaz adını senkronize eder ve ekrana yansıtır. */
+      function syncDeviceNameFromPayload(data, skipSave) {
+        if (!data) return "";
+        const rawDeviceName = data.device_name != null ? String(data.device_name).trim() : "";
+        const rawHostname = data.hostname != null ? String(data.hostname).trim() : "";
+        const resolvedName = rawDeviceName || rawHostname;
+
+        let cfgChanged = false;
+        const normalizedResolved = normalizeDeviceName(resolvedName);
+        if (normalizedResolved && normalizedResolved !== appConfig.lastDeviceName) {
+          appConfig.lastDeviceName = normalizedResolved;
+          cfgChanged = true;
+        }
+        if (typeof data.custom_device_name === "string") {
+          const normalizedCustom = normalizeDeviceName(data.custom_device_name);
+          if (normalizedCustom !== appConfig.customDeviceName) {
+            appConfig.customDeviceName = normalizedCustom;
+            cfgChanged = true;
+          }
+        }
+        if (cfgChanged && !skipSave) {
+          saveConfig(appConfig);
+        }
+
+        applyDeviceNameDisplay(resolvedName, data.system_hostname);
+        return resolvedName;
+      }
+
+      // 5. Wake-on-LAN Sinyali
+      async function sendWakeOnLan(isManualTest) {
+        const mac = appConfig && typeof appConfig.pcMac === "string" ? appConfig.pcMac.trim() : "";
+        if (!mac) {
+          triggerHaptic(90);
+          showToast("MAC adresi henüz kayıtlı değil. Önce PC açıkken bir kez bağlanın veya Ayarlar'dan girin.", true);
+          return;
+        }
+
+        triggerHaptic([60, 80]);
+
+        if (isAndroidApp && window.AndroidBridge && typeof window.AndroidBridge.wakeOnLan === "function") {
+          try {
+            // AndroidBridge'in hem 3 hem 4 parametreli (hedef IP destekli) metot yapısıyla uyumlu
+            window.AndroidBridge.wakeOnLan(mac, appConfig.broadcastIp, 9, appConfig.pcIp);
+          } catch (err) {
+            console.warn("AndroidBridge WoL hatası:", err);
+          }
+        }
+
+        try {
+          const apiBase = getApiBase();
+          if (apiBase) {
+            fetch(apiBase + "/api/wol", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                mac: mac,
+                broadcast: appConfig.broadcastIp
+              })
+            }).catch(function () {});
+          }
+        } catch (e) {}
+
+        if (isManualTest || isPcOnline) {
+          showToast("WoL sinyali iletildi: " + mac);
+        } else {
+          startWakingSequence();
+          showToast("Sihirli paket (" + mac + ") yollandı. Kasa başlatılıyor...");
+        }
+      }
+
+      function clearPowerTransitionPolls() {
+        while (powerTransitionTimers.length > 0) {
+          clearTimeout(powerTransitionTimers.pop());
+        }
+      }
+
+      function schedulePowerTransitionPolls() {
+        clearPowerTransitionPolls();
+        [1500, 3500, 5500].forEach(function (delayMs) {
+          const tid = setTimeout(function () {
+            pollTelemetry(true);
+          }, delayMs);
+          powerTransitionTimers.push(tid);
+        });
+      }
+
+      function startWakingSequence() {
+        clearPowerTransitionPolls();
+        powerTransitionUntil = 0;
+        powerTransitionLabel = "";
+        isWakingUp = true;
+        wakingSecondsRemaining = 45;
+        renderInterfaceState();
+
+        if (wakingTimer) clearInterval(wakingTimer);
+        wakingTimer = setInterval(function () {
+          wakingSecondsRemaining--;
+          if (wakingSecondsRemaining <= 0 || isPcOnline) {
+            clearInterval(wakingTimer);
+            wakingTimer = null;
+            isWakingUp = false;
+            renderInterfaceState();
+          } else {
+            renderWakingProgress();
+          }
+        }, 1000);
+      }
+
+      function renderWakingProgress() {
+        if (!isWakingUp) return;
+        elTextStatusState.textContent = "Uyandırılıyor (" + wakingSecondsRemaining + "s)";
+        elPowerInfoHeading.textContent = "Kasa Başlatılıyor... (" + wakingSecondsRemaining + "s)";
+        elPowerInfoDesc.textContent = "BIOS ve Windows başlatılıyor, telemetri bekleniyor.";
+        elHeroBtnLabel.textContent = "Uyanıyor (" + wakingSecondsRemaining + "s)";
+      }
+
+      // 6. Güç Komutları
+      async function sendPowerAction(action, extraPayload) {
+        triggerHaptic(50);
+        const apiBase = getApiBase();
+        if (!apiBase) {
+          showToast("PC bağlantısı kurulmadı. Önce ağdaki bilgisayarı bulun veya IP adresini girin.", true);
+          handleOfflineState();
+          renderInterfaceState();
+          return false;
+        }
+        const payload = Object.assign({ action: action }, extraPayload || {});
+
+        try {
+          const response = await fetch(apiBase + "/api/power", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          const rawText = await response.text();
+          let data = null;
+          if (rawText) {
+            try {
+              data = JSON.parse(rawText);
+            } catch (parseErr) {
+              data = null;
+            }
+          }
+
+          if (!response.ok) {
+            const httpErrMsg = (data && (data.error || data.message)) || ("Sunucu hatası (HTTP " + response.status + ").");
+            showToast(httpErrMsg, true);
+            return false;
+          }
+
+          if (data && data.success) {
+            showToast(data.message || "İşlem başarılı.");
+            if (action === "shutdown" || action === "restart" || action === "sleep") {
+              powerTransitionUntil = Date.now() + 6500;
+              powerTransitionLabel = action === "shutdown"
+                ? "Kapatılıyor..."
+                : (action === "restart" ? "Yeniden Başlatılıyor..." : "Uykuya Geçiliyor...");
+              schedulePowerTransitionPolls();
+            } else {
+              pollTelemetry(true);
+            }
+            return true;
+          }
+
+          showToast((data && (data.error || data.message)) || "İşlem reddedildi.", true);
+          return false;
+        } catch (err) {
+          showToast("Bağlantı hatası: " + (err && err.message ? err.message : "Ağ hatası"), true);
+          return false;
+        }
+      }
+
+      // 7. İki Aşamalı Güvenlik Onayı
+      function armButton(btnElement, confirmText, callback, isWarn) {
+        if (armingButton === btnElement) {
+          clearArming();
+          callback();
+          return;
+        }
+
+        clearArming();
+        armingButton = btnElement;
+        const armClass = isWarn ? "arming-warn" : "arming-danger";
+        btnElement.classList.add(armClass);
+
+        const nameEl = btnElement.querySelector(".action-btn-name");
+        const subEl = btnElement.querySelector(".action-btn-sub");
+        const oldName = nameEl ? nameEl.textContent : "";
+        const oldSub = subEl ? subEl.textContent : "";
+
+        if (nameEl) nameEl.textContent = confirmText || "Onaylamak İçin Basın";
+        if (subEl) subEl.textContent = "3 saniye içinde iptal";
+        triggerHaptic(40);
+
+        armingTimer = setTimeout(function () {
+          clearArming();
+        }, 3200);
+
+        btnElement._restoreState = function () {
+          btnElement.classList.remove(armClass);
+          if (nameEl) nameEl.textContent = oldName;
+          if (subEl) subEl.textContent = oldSub;
+        };
+      }
+
+      function clearArming() {
+        if (armingTimer) {
+          clearTimeout(armingTimer);
+          armingTimer = null;
+        }
+        if (armingButton && typeof armingButton._restoreState === "function") {
+          armingButton._restoreState();
+        }
+        armingButton = null;
+      }
+
+      // Hero güç butonu iki aşamalı onay temizliği (polling'den bağımsız, tek zamanlayıcı)
+      function clearHeroArm() {
+        if (heroArmTimer) {
+          clearTimeout(heroArmTimer);
+          heroArmTimer = null;
+        }
+        elBtnHeroPower.classList.remove("switch-mode-confirm", "is-armed");
+        if (isPcOnline) elHeroBtnLabel.textContent = "Kasayı Kapat";
+      }
+
+      // 8. Canlı Telemetri & Otomatik Keşif
+      let isPolling = false;
+      let queuedPollRequested = false;
+      let isDiscovering = false;
+      let hasTriedInitialAutoDiscovery = false;
+
+      function applyAutoDiscoveryMatch(payload, mapped) {
+        if (mapped.ip && !isLoopbackHost(mapped.ip)) appConfig.pcIp = mapped.ip;
+        if (mapped.port) appConfig.pcPort = mapped.port;
+        if (mapped.mac) appConfig.pcMac = mapped.mac;
+        if (mapped.broadcast) appConfig.broadcastIp = mapped.broadcast;
+
+        const resolvedName = syncDeviceNameFromPayload(payload, true);
+        saveConfig(appConfig);
+
+        updateNetworkLabels();
+
+        populateSettingsInputs(typeof payload.custom_device_name === "string" ? appConfig.customDeviceName : undefined);
+
+        const hostName = resolvedName || "PC";
+        showToast("Bilgisayar bulundu: " + hostName + " (" + (mapped.ip || appConfig.pcIp) + ")");
+        triggerHaptic([50, 70]);
+        pollTelemetry(true);
+        return payload;
+      }
+
+      async function performAutoDiscovery(isManual) {
+        if (isDiscovering) return null;
+        isDiscovering = true;
+
+        if (elBtnAutoDiscover) {
+          elBtnAutoDiscover.classList.add("is-loading");
+        }
+        if (elTxtAutoDiscover) {
+          elTxtAutoDiscover.textContent = "Ağ Taranıyor...";
+        }
+
+        if (isManual) {
+          showToast("Ağdaki bilgisayar taranıyor...");
+          triggerHaptic(40);
+        }
+
+        try {
+          // 1. AndroidBridge UDP Discovery
+          if (isAndroidApp && window.AndroidBridge && typeof window.AndroidBridge.discoverPc === "function") {
+            const discoveryRes = await new Promise(function (resolve) {
+              setTimeout(function () {
+                try {
+                  const res = window.AndroidBridge.discoverPc(appConfig.broadcastIp || "");
+                  resolve(res);
+                } catch (err) {
+                  console.warn("AndroidBridge discoverPc hatası:", err);
+                  resolve("");
+                }
+              }, 30);
+            });
+
+            if (discoveryRes && discoveryRes.trim().startsWith("{")) {
+              try {
+                const discovered = JSON.parse(discoveryRes.trim());
+                if (discovered && (discovered.service === "pc-kontrol" || discovered.ip)) {
+                  return applyAutoDiscoveryMatch(discovered, {
+                    ip: discovered.ip,
+                    port: discovered.port,
+                    mac: discovered.mac,
+                    broadcast: discovered.broadcast
+                  });
+                }
+              } catch (parseError) {
+                console.warn("Keşif JSON ayrıştırma hatası:", parseError);
+              }
+            }
+          }
+
+          // 2. Web Ortamında veya Fallback: Aktif API üzerinden durum sorgusu
+          const apiBase = getApiBase();
+          if (isHttp && apiBase) {
+            const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+            const timeoutId = controller ? setTimeout(function () { controller.abort(); }, 2000) : null;
+            try {
+              const fetchOpts = { cache: "no-store" };
+              if (controller) fetchOpts.signal = controller.signal;
+              const res = await fetch(apiBase + "/api/status", fetchOpts);
+              if (res.ok) {
+                const statusData = await res.json();
+                if (statusData && (statusData.ip_address || statusData.online)) {
+                  return applyAutoDiscoveryMatch(statusData, {
+                    ip: statusData.ip_address,
+                    port: statusData.port,
+                    mac: statusData.mac_address,
+                    broadcast: statusData.broadcast_ip
+                  });
+                }
+              }
+            } catch (httpErr) {
+            } finally {
+              if (timeoutId) clearTimeout(timeoutId);
+            }
+          }
+
+          if (isManual) {
+            showToast("Ağda açık PC Kontrol servisi bulunamadı.", true);
+            triggerHaptic(90);
+          }
+          return null;
+        } catch (err) {
+          if (isManual) {
+            showToast("Arama başarısız: " + err.message, true);
+          }
+          return null;
+        } finally {
+          isDiscovering = false;
+          if (elBtnAutoDiscover) {
+            elBtnAutoDiscover.classList.remove("is-loading");
+          }
+          if (elTxtAutoDiscover) {
+            elTxtAutoDiscover.textContent = "Ağdaki Bilgisayarı Otomatik Bul";
+          }
+        }
+      }
+
+      async function pollTelemetry(queueIfBusy) {
+        if (document.hidden) return;
+        const apiBase = getApiBase();
+        if (!apiBase) {
+          handleOfflineState();
+          renderInterfaceState();
+          return;
+        }
+        if (isPolling) {
+          if (queueIfBusy) queuedPollRequested = true;
+          return;
+        }
+        isPolling = true;
+        let shouldRunQueued = false;
+
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(function () { controller.abort(); }, 1700) : null;
+
+        try {
+          const fetchOpts = {
+            method: "GET",
+            headers: { "Accept": "application/json" },
+            cache: "no-store"
+          };
+          if (controller) fetchOpts.signal = controller.signal;
+
+          const response = await fetch(apiBase + "/api/status", fetchOpts);
+
+          if (response.ok) {
+            const data = await response.json();
+            isPcOnline = true;
+            if (isWakingUp) {
+              isWakingUp = false;
+              if (wakingTimer) {
+                clearInterval(wakingTimer);
+                wakingTimer = null;
+              }
+            }
+            lastTelemetryData = data;
+
+            // OTOMATİK SENKRONİZASYON: Sunucudan dönen dinamik ağ bilgilerini config'e kaydet
+            let cfgChanged = false;
+            if (data.mac_address && data.mac_address !== appConfig.pcMac) {
+              appConfig.pcMac = data.mac_address;
+              cfgChanged = true;
+            }
+            if (data.broadcast_ip && data.broadcast_ip !== appConfig.broadcastIp) {
+              appConfig.broadcastIp = data.broadcast_ip;
+              cfgChanged = true;
+            }
+            if (data.ip_address && !isLoopbackHost(data.ip_address) && data.ip_address !== appConfig.pcIp) {
+              appConfig.pcIp = data.ip_address;
+              cfgChanged = true;
+            }
+            if (data.port && data.port !== appConfig.pcPort) {
+              appConfig.pcPort = data.port;
+              cfgChanged = true;
+            }
+            if (cfgChanged) {
+              saveConfig(appConfig);
+              if (elModalQr && elModalQr.classList.contains("is-open")) {
+                generateQrSvg();
+              }
+            }
+
+            renderTelemetry(data);
+          } else {
+            handleOfflineState();
+          }
+        } catch (err) {
+          handleOfflineState();
+        } finally {
+          if (timeoutId) clearTimeout(timeoutId);
+          isPolling = false;
+          shouldRunQueued = queuedPollRequested;
+          queuedPollRequested = false;
+        }
+
+        renderInterfaceState();
+
+        if (shouldRunQueued && !document.hidden) {
+          pollTelemetry(false);
+        }
+      }
+
+      function handleOfflineState() {
+        isPcOnline = false;
+        lastTelemetryData = null;
+        powerTransitionUntil = 0;
+        powerTransitionLabel = "";
+        clearArming();
+
+        // Android APK'da kayıtlı IP'ye ilk bağlantı başarısızsa arka planda otomatik keşfet
+        if (isAndroidApp && !hasTriedInitialAutoDiscovery && !isDiscovering) {
+          hasTriedInitialAutoDiscovery = true;
+          performAutoDiscovery(false);
+        }
+      }
+
+      // 9. Duruma Göre Render
+      function renderInterfaceState() {
+        document.body.classList.remove("state-online", "state-offline", "state-waking");
+
+        if (isWakingUp) {
+          clearHeroArm();
+          document.body.classList.add("state-waking");
+          renderWakingProgress();
+          elBtnHeroPower.className = "primary-switch-btn primary-power-btn switch-mode-waking";
+          elLabelSystemSubstate.textContent = "Uyanıyor...";
+
+        } else if (isPcOnline) {
+          document.body.classList.add("state-online");
+          elTextStatusState.textContent = "Açık";
+          elLabelSystemSubstate.textContent = "Çevrimiçi";
+          elPowerInfoHeading.textContent = "Sistem Çalışıyor";
+          elPowerInfoDesc.textContent = "Donanım aktif, arka plan telemetri servisi devrede.";
+
+          // Onay bekleyen buton durumunu polling ezmemeli
+          const heroArmed = elBtnHeroPower.classList.contains("switch-mode-confirm")
+                         || elBtnHeroPower.classList.contains("is-armed");
+          if (!heroArmed) {
+            elBtnHeroPower.className = "primary-switch-btn primary-power-btn switch-mode-shutdown";
+            if (Date.now() < powerTransitionUntil && powerTransitionLabel) {
+              elHeroBtnLabel.textContent = powerTransitionLabel;
+            } else {
+              powerTransitionUntil = 0;
+              powerTransitionLabel = "";
+              elHeroBtnLabel.textContent = "Kasayı Kapat";
+            }
+          }
+
+        } else {
+          clearHeroArm();
+          document.body.classList.add("state-offline");
+          elTextStatusState.textContent = "Kapalı";
+          elLabelSystemSubstate.textContent = "Kapalı";
+          elPowerInfoHeading.textContent = "Kasa Kapalı — WoL Hazır";
+          elPowerInfoDesc.textContent = "Uzaktan çalıştırma sinyali (Magic Packet) göndermek için tuşa basın.";
+
+          elBtnHeroPower.className = "primary-switch-btn primary-power-btn switch-mode-wol";
+          elHeroBtnLabel.textContent = "Kasayı Aç";
+          resetTelemetryVisuals();
+        }
+      }
+
+      function updateTempBadge(badgeEl, tempVal) {
+        if (!badgeEl) return;
+        const val = Number(tempVal);
+        if (tempVal == null || isNaN(val) || val <= 0) {
+          badgeEl.style.display = "none";
+          badgeEl.textContent = "";
+          badgeEl.className = "temp-badge";
+          return;
+        }
+        badgeEl.style.display = "inline-flex";
+        badgeEl.textContent = (val % 1 === 0 ? val.toFixed(0) : val.toFixed(1)) + "°C";
+        if (val < 55) {
+          badgeEl.className = "temp-badge temp-cool";
+        } else if (val <= 75) {
+          badgeEl.className = "temp-badge temp-warm";
+        } else {
+          badgeEl.className = "temp-badge temp-hot";
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function renderTelemetry(data) {
+        if (!data) return;
+
+        syncDeviceNameFromPayload(data);
+        updateNetworkLabels(data.ip_address, data.mac_address);
+
+        const port = data.port || appConfig.pcPort || 8765;
+
+        // CPU: ${cores} Çekirdek · ${ghz} GHz ve cpu_temp_c rozeti
+        const cpuPct = Number(data.cpu_percent) || 0;
+        elStatCpuPercent.textContent = cpuPct.toFixed(1) + "%";
+        elBarCpu.style.width = Math.min(100, Math.max(0, cpuPct)) + "%";
+        const cores = data.cpu_cores ? data.cpu_cores.logical : "--";
+        const freq = data.cpu_freq_ghz ? data.cpu_freq_ghz : "--";
+        if (elTextCpuSpec) {
+          elTextCpuSpec.textContent = cores + " Çekirdek · " + freq + " GHz";
+        } else {
+          elStatCpuSpec.textContent = cores + " Çekirdek · " + freq + " GHz";
+        }
+        updateTempBadge(elBadgeCpuTemp, data.cpu_temp_c);
+
+        // Ekran Kartı (GPU): %xx, progress bar, [47°C] ve RTX 4060 · 1.9 / 8.2 GB
+        const gpu = data.gpu;
+        if (gpu && (gpu.available || gpu.util_percent != null || gpu.temp_c != null)) {
+          const gpuPct = Number(gpu.util_percent) || 0;
+          elStatGpuPercent.textContent = Math.round(gpuPct) + "%";
+          elBarGpu.style.width = Math.min(100, Math.max(0, gpuPct)) + "%";
+
+          let gpuName = gpu.name ? String(gpu.name).replace(/NVIDIA\s+GeForce\s+/i, "").replace(/\s+Laptop\s+GPU/i, "").trim() : "GPU";
+          let vramStr = "";
+          if (gpu.mem_used_mb != null && gpu.mem_total_mb != null && gpu.mem_total_mb > 0) {
+            const usedGb = (gpu.mem_used_mb / 1024).toFixed(1);
+            const totalGb = (gpu.mem_total_mb / 1024).toFixed(1);
+            vramStr = usedGb + " / " + totalGb + " GB";
+          }
+          const gpuSubText = vramStr ? (gpuName + " · " + vramStr) : gpuName;
+          if (elTextGpuSpec) {
+            elTextGpuSpec.textContent = gpuSubText;
+            elTextGpuSpec.title = (gpu.name || "") + (vramStr ? " (" + vramStr + ")" : "");
+          } else {
+            elStatGpuSpec.textContent = gpuSubText;
+          }
+
+          updateTempBadge(elBadgeGpuTemp, gpu.temp_c);
+        } else {
+          elStatGpuPercent.textContent = "--%";
+          elBarGpu.style.width = "0%";
+          if (elTextGpuSpec) {
+            elTextGpuSpec.textContent = "Harici GPU Yok";
+            elTextGpuSpec.removeAttribute("title");
+          } else {
+            elStatGpuSpec.textContent = "Harici GPU Yok";
+          }
+          updateTempBadge(elBadgeGpuTemp, null);
+        }
+
+        // Bellek: ${used.toFixed(1)} / ${total.toFixed(1)} GB
+        const ramPct = Number(data.ram_percent) || 0;
+        elStatRamPercent.textContent = ramPct.toFixed(1) + "%";
+        elBarRam.style.width = Math.min(100, Math.max(0, ramPct)) + "%";
+        const ramUsed = Number(data.ram_used_gb) || 0;
+        const ramTotal = Number(data.ram_total_gb) || 0;
+        elStatRamSpec.textContent = ramUsed.toFixed(1) + " / " + ramTotal.toFixed(1) + " GB";
+
+        // Depolama (Tekli veya Çoklu Disk)
+        const disks = Array.isArray(data.disks) && data.disks.length > 0 ? data.disks : null;
+        if (disks && disks.length > 1) {
+          // Çoklu disk görünümü (C: 26% · D: 36%)
+          elStatDiskPercent.className = "telemetry-val is-multi";
+          const valChips = disks.map(function (d) {
+            const mount = escapeHtml(String(d.mount || "").replace(/\\/g, ""));
+            const pct = Math.round(Number(d.percent) || 0);
+            return '<span class="disk-chip" title="' + mount + ' %' + (Number(d.percent) || 0).toFixed(1) + '"><strong class="disk-drive">' + mount + '</strong> ' + pct + '%</span>';
+          });
+          elStatDiskPercent.innerHTML = valChips.join('<span class="disk-sep">·</span>');
+
+          // Çoklu segmentli doluluk barı
+          elBarDiskWrap.className = "telemetry-bar-wrap is-multi";
+          elBarDiskWrap.innerHTML = disks.map(function (d) {
+            const pct = Math.min(100, Math.max(0, Number(d.percent) || 0));
+            const mount = escapeHtml(String(d.mount || "").replace(/\\/g, ""));
+            return '<div class="telemetry-bar-segment" title="' + mount + ' %' + pct.toFixed(1) + '"><div class="telemetry-bar-fill" style="width: ' + pct + '%;"></div></div>';
+          }).join("");
+
+          // Alt bilgi (C: 122/465G · D: 318/894G)
+          elStatDiskSpec.className = "telemetry-sub is-multi";
+          const specChips = disks.map(function (d) {
+            const mount = escapeHtml(String(d.mount || "").replace(/\\/g, ""));
+            const used = Math.round(Number(d.used_gb) || 0);
+            const total = Math.round(Number(d.total_gb) || 0);
+            return '<span class="disk-sub-item" title="' + mount + ' ' + (Number(d.used_gb) || 0).toFixed(1) + ' / ' + (Number(d.total_gb) || 0).toFixed(1) + ' GB">' + mount + ' ' + used + '/' + total + 'G</span>';
+          });
+          elStatDiskSpec.innerHTML = specChips.join('<span class="disk-sep">·</span>');
+        } else {
+          // Tek disk görünümü (veya fallback)
+          const single = (disks && disks.length === 1) ? disks[0] : null;
+          const diskPct = single ? (Number(single.percent) || 0) : (Number(data.disk_percent) || 0);
+          const diskUsed = single ? (Number(single.used_gb) || 0) : (Number(data.disk_used_gb) || 0);
+          const diskTotal = single ? (Number(single.total_gb) || 0) : (Number(data.disk_total_gb) || 0);
+
+          elStatDiskPercent.className = "telemetry-val";
+          elStatDiskPercent.textContent = diskPct.toFixed(1) + "%";
+
+          elBarDiskWrap.className = "telemetry-bar-wrap";
+          elBarDiskWrap.innerHTML = '<div class="telemetry-bar-fill" id="bar-disk" style="width: ' + Math.min(100, Math.max(0, diskPct)) + '%;"></div>';
+
+          elStatDiskSpec.className = "telemetry-sub";
+          elStatDiskSpec.textContent = Math.round(diskUsed) + " / " + Math.round(diskTotal) + " GB";
+        }
+
+        // Uptime (Açık Kalma)
+        const sec = data.uptime_seconds != null ? data.uptime_seconds : 0;
+        if (sec > 0) {
+          const hours = Math.floor(sec / 3600);
+          const mins = Math.floor((sec % 3600) / 60);
+          const secs = sec % 60;
+          if (hours > 0) {
+            elStatUptimeVal.textContent = hours + "sa " + mins + "dk";
+            elStatPortSpec.textContent = secs + " sn · Port " + port;
+          } else {
+            elStatUptimeVal.textContent = mins + "dk " + secs + "sn";
+            elStatPortSpec.textContent = "Port " + port + " · Dinleniyor";
+          }
+        } else if (data.uptime_text) {
+          elStatUptimeVal.textContent = data.uptime_text;
+          elStatPortSpec.textContent = "Port " + port + " · Dinleniyor";
+        } else {
+          elStatUptimeVal.textContent = "--";
+          elStatPortSpec.textContent = "Port " + port + " · Dinleniyor";
+        }
+
+        // Zamanlayıcı
+        renderScheduledShutdown(data.scheduled_shutdown);
+      }
+
+      function clearCountdownTimer() {
+        if (countdownTimerInterval) {
+          clearInterval(countdownTimerInterval);
+          countdownTimerInterval = null;
+        }
+        activeShutdownTargetTs = null;
+      }
+
+      function resetTelemetryVisuals() {
+        clearCountdownTimer();
+
+        elStatCpuPercent.textContent = "--%";
+        elBarCpu.style.width = "0%";
+        if (elTextCpuSpec) {
+          elTextCpuSpec.textContent = "-- Çekirdek · -- GHz";
+        } else {
+          elStatCpuSpec.textContent = "-- Çekirdek · -- GHz";
+        }
+        updateTempBadge(elBadgeCpuTemp, null);
+
+        elStatGpuPercent.textContent = "--%";
+        elBarGpu.style.width = "0%";
+        if (elTextGpuSpec) {
+          elTextGpuSpec.textContent = "-- · -- GB";
+          elTextGpuSpec.removeAttribute("title");
+        } else {
+          elStatGpuSpec.textContent = "-- · -- GB";
+        }
+        updateTempBadge(elBadgeGpuTemp, null);
+
+        elStatRamPercent.textContent = "--%";
+        elBarRam.style.width = "0%";
+        elStatRamSpec.textContent = "-- / -- GB";
+
+        elStatDiskPercent.className = "telemetry-val";
+        elStatDiskPercent.textContent = "--%";
+        elBarDiskWrap.className = "telemetry-bar-wrap";
+        elBarDiskWrap.innerHTML = '<div class="telemetry-bar-fill" id="bar-disk" style="width: 0%;"></div>';
+        elStatDiskSpec.className = "telemetry-sub";
+        elStatDiskSpec.textContent = "-- / -- GB";
+
+        elStatUptimeVal.textContent = "Kapalı";
+        elStatPortSpec.textContent = "Port " + (appConfig.pcPort || 8765) + " · Dinleniyor";
+        elBannerTimerActive.style.display = "none";
+      }
+
+      function updateCountdownDisplay() {
+        if (!activeShutdownTargetTs) return;
+        const nowSec = Math.floor(Date.now() / 1000);
+        const diff = activeShutdownTargetTs - nowSec;
+        if (diff <= 0) {
+          elTextTimerCountdown.textContent = "00:00:00 (Kapatılıyor...)";
+          clearCountdownTimer();
+          return;
+        }
+        const h = Math.floor(diff / 3600);
+        const m = Math.floor((diff % 3600) / 60);
+        const s = diff % 60;
+        const pad = function (n) { return n < 10 ? "0" + n : n; };
+        elTextTimerCountdown.textContent = pad(h) + ":" + pad(m) + ":" + pad(s) + " sonra kapanacak";
+      }
+
+      function renderScheduledShutdown(sched) {
+        if (!sched || !sched.active || sched.remaining_seconds <= 0 || !sched.target_timestamp) {
+          elBannerTimerActive.style.display = "none";
+          clearCountdownTimer();
+          return;
+        }
+
+        elBannerTimerActive.style.display = "flex";
+        activeShutdownTargetTs = sched.target_timestamp;
+        updateCountdownDisplay();
+        if (!countdownTimerInterval) {
+          countdownTimerInterval = setInterval(updateCountdownDisplay, 1000);
+        }
+      }
+
+      // 10. Olay Dinleyicileri
+      elBtnHeroPower.addEventListener("click", function () {
+        if (isWakingUp) {
+          showToast("Kasa zaten uyandırılıyor, lütfen bekleyin...");
+          return;
+        }
+
+        if (isPcOnline) {
+          const heroArmed = elBtnHeroPower.classList.contains("switch-mode-confirm")
+                         || elBtnHeroPower.classList.contains("is-armed");
+
+          // Çift dokunma koruması: onaydan hemen sonra kapanış isteği tekilleştirilir
+          if (heroArmed) {
+            if (shutdownRequestPending) return;
+            shutdownRequestPending = true;
+            clearHeroArm();
+            elHeroBtnLabel.textContent = "Kapatılıyor...";
+            sendPowerAction("shutdown").then(function (ok) {
+              if (!ok) {
+                renderInterfaceState();
+              }
+            }).finally(function () {
+              shutdownRequestPending = false;
+            });
+          } else {
+            clearHeroArm();
+            elBtnHeroPower.classList.add("switch-mode-confirm", "is-armed");
+            elHeroBtnLabel.textContent = "Kapatmayı Onayla (3s)";
+            triggerHaptic([30, 40]);
+            heroArmTimer = setTimeout(clearHeroArm, 3200);
+          }
+        } else {
+          sendWakeOnLan();
+        }
+      });
+
+      if (elBtnSecondaryWol) {
+        elBtnSecondaryWol.addEventListener("click", function () {
+          sendWakeOnLan(true);
+        });
+      }
+
+      // 4'lü Sistem Butonları
+      if (elBtnRestart) {
+        elBtnRestart.addEventListener("click", function () {
+          armButton(elBtnRestart, "Yeniden Başlatmayı Onayla", function () {
+            sendPowerAction("restart");
+          }, true);
+        });
+      }
+
+      if (elBtnSleep) {
+        elBtnSleep.addEventListener("click", function () {
+          armButton(elBtnSleep, "Uykuya Almayı Onayla", function () {
+            sendPowerAction("sleep");
+          }, true);
+        });
+      }
+
+      if (elBtnLock) {
+        elBtnLock.addEventListener("click", function () {
+          triggerHaptic(40);
+          sendPowerAction("lock");
+        });
+      }
+
+      if (elBtnCmdWol) {
+        elBtnCmdWol.addEventListener("click", function () {
+          sendWakeOnLan(true);
+        });
+      }
+
+      // Zamanlayıcı
+      document.querySelectorAll(".preset-pill-btn[data-min]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          const minutes = parseInt(btn.getAttribute("data-min"), 10);
+          if (minutes > 0) {
+            sendPowerAction("schedule_shutdown", { delay_minutes: minutes });
+          }
+        });
+      });
+
+      function submitCustomTimer() {
+        const val = parseInt(elInputCustomMinutes.value, 10);
+        if (val && val >= 1 && val <= 1440) {
+          sendPowerAction("schedule_shutdown", { delay_minutes: val });
+          elInputCustomMinutes.value = "";
+        } else {
+          showToast("Lütfen 1 ile 1440 dakika arasında geçerli bir değer girin.", true);
+        }
+      }
+
+      if (elBtnStartTimer) {
+        elBtnStartTimer.addEventListener("click", submitCustomTimer);
+      }
+
+      if (elInputCustomMinutes) {
+        elInputCustomMinutes.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submitCustomTimer();
+          }
+        });
+      }
+
+      if (elBtnCancelTimer) {
+        elBtnCancelTimer.addEventListener("click", function () {
+          sendPowerAction("cancel_timer");
+        });
+      }
+
+      // 11. Ayarlar Modalı
+      function populateSettingsInputs(deviceNameVal) {
+        if (elCfgDeviceName) {
+          if (typeof deviceNameVal === "string") {
+            elCfgDeviceName.value = deviceNameVal;
+          }
+          elCfgDeviceName.placeholder = appConfig.lastDeviceName ? ("Otomatik (" + appConfig.lastDeviceName + ")") : "Otomatik";
+        }
+        if (elCfgPcIp) elCfgPcIp.value = appConfig.pcIp;
+        if (elCfgPcPort) elCfgPcPort.value = appConfig.pcPort;
+        if (elCfgPcMac) elCfgPcMac.value = appConfig.pcMac;
+        if (elCfgPcBroadcast) elCfgPcBroadcast.value = appConfig.broadcastIp;
+      }
+
+      function openSettings() {
+        const deviceNameVal = (lastTelemetryData && typeof lastTelemetryData.custom_device_name === "string")
+          ? lastTelemetryData.custom_device_name
+          : (appConfig.customDeviceName || "");
+        populateSettingsInputs(deviceNameVal);
+        elModalSettings.classList.add("is-open");
+      }
+
+      function closeSettings() {
+        elModalSettings.classList.remove("is-open");
+      }
+
+      elBtnOpenSettings.addEventListener("click", openSettings);
+      elBtnCloseSettings.addEventListener("click", closeSettings);
+
+      if (elBtnAutoDiscover) {
+        elBtnAutoDiscover.addEventListener("click", function () {
+          performAutoDiscovery(true);
+        });
+      }
+
+      elModalSettings.addEventListener("click", function (e) {
+        if (e.target === elModalSettings) {
+          closeSettings();
+        }
+      });
+
+      /** Cihaz adını sunucu yapılandırmasıyla senkronize eder. */
+      async function postDeviceNameConfig(deviceName) {
+        const apiBase = getApiBase();
+        if (!apiBase) {
+          return null;
+        }
+        const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(function () { controller.abort(); }, 2500) : null;
+        try {
+          const fetchOpts = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ device_name: deviceName })
+          };
+          if (controller) fetchOpts.signal = controller.signal;
+          const res = await fetch(apiBase + "/api/config", fetchOpts);
+          if (res.ok) {
+            const cfgRes = await res.json();
+            if (cfgRes) {
+              const serverDisplayName = normalizeDeviceName(cfgRes.device_name || "");
+              const serverCustomName = typeof cfgRes.custom_device_name === "string"
+                ? normalizeDeviceName(cfgRes.custom_device_name)
+                : normalizeDeviceName(deviceName);
+              let changed = false;
+              if (serverCustomName !== appConfig.customDeviceName) {
+                appConfig.customDeviceName = serverCustomName;
+                changed = true;
+              }
+              if (serverDisplayName && serverDisplayName !== appConfig.lastDeviceName) {
+                appConfig.lastDeviceName = serverDisplayName;
+                changed = true;
+              }
+              if (changed) {
+                saveConfig(appConfig);
+              }
+              if (lastTelemetryData && typeof lastTelemetryData === "object") {
+                if (serverDisplayName) lastTelemetryData.device_name = serverDisplayName;
+                lastTelemetryData.custom_device_name = serverCustomName;
+                if (cfgRes.system_hostname) {
+                  lastTelemetryData.system_hostname = cfgRes.system_hostname;
+                }
+              }
+              const sysHost = cfgRes.system_hostname || (lastTelemetryData && lastTelemetryData.system_hostname) || "";
+              applyDeviceNameDisplay(serverDisplayName || appConfig.customDeviceName || appConfig.lastDeviceName || "PC Kontrol", sysHost);
+              return cfgRes;
+            }
+          }
+        } catch (err) {
+          // Sunucu çevrimdışı veya erişilemiyor; yerel kayıt korunur.
+        } finally {
+          if (timeoutId) clearTimeout(timeoutId);
+        }
+        return null;
+      }
+
+      async function saveSettingsFromModal() {
+        const newCustomName = elCfgDeviceName ? normalizeDeviceName(elCfgDeviceName.value) : "";
+        const rawIp = elCfgPcIp ? elCfgPcIp.value.trim() : "";
+        const newIp = (rawIp && !isLoopbackHost(rawIp)) ? rawIp : DEFAULT_CONFIG.pcIp;
+        const parsedPort = parseInt(elCfgPcPort ? elCfgPcPort.value : "", 10);
+        const newPort = (parsedPort >= 1 && parsedPort <= 65535) ? parsedPort : DEFAULT_CONFIG.pcPort;
+        const newMac = (elCfgPcMac ? elCfgPcMac.value.trim() : "") || DEFAULT_CONFIG.pcMac;
+        const newBroadcast = (elCfgPcBroadcast ? elCfgPcBroadcast.value.trim() : "") || DEFAULT_CONFIG.broadcastIp;
+
+        appConfig = {
+          pcIp: newIp,
+          pcPort: newPort,
+          pcMac: newMac,
+          broadcastIp: newBroadcast,
+          customDeviceName: newCustomName,
+          lastDeviceName: appConfig.lastDeviceName || ""
+        };
+
+        saveConfig(appConfig);
+        updateNetworkLabels();
+        applyDeviceNameDisplay(
+          newCustomName || appConfig.lastDeviceName || "PC Kontrol",
+          lastTelemetryData && lastTelemetryData.system_hostname
+        );
+        renderInterfaceState();
+        closeSettings();
+        showToast("Ağ ayarları güncellendi.");
+
+        await postDeviceNameConfig(newCustomName);
+        pollTelemetry(true);
+      }
+
+      elBtnSaveSettings.addEventListener("click", saveSettingsFromModal);
+
+      [elCfgDeviceName, elCfgPcIp, elCfgPcPort, elCfgPcMac, elCfgPcBroadcast].forEach(function (inp) {
+        if (!inp) return;
+        inp.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            elBtnSaveSettings.click();
+          }
+        });
+      });
+
+      elBtnResetSettings.addEventListener("click", async function () {
+        appConfig = Object.assign({}, DEFAULT_CONFIG);
+        appConfig.customDeviceName = "";
+        saveConfig(appConfig);
+        populateSettingsInputs("");
+        updateNetworkLabels();
+        applyDeviceNameDisplay(
+          (lastTelemetryData && lastTelemetryData.system_hostname) || "",
+          lastTelemetryData && lastTelemetryData.system_hostname
+        );
+        renderInterfaceState();
+        showToast("Varsayılan yapılandırma yüklendi.");
+
+        if (isPcOnline) {
+          await postDeviceNameConfig("");
+          if (elCfgDeviceName) {
+            elCfgDeviceName.placeholder = appConfig.lastDeviceName ? ("Otomatik (" + appConfig.lastDeviceName + ")") : "Otomatik";
+          }
+          pollTelemetry(true);
+        }
+      });
+
+      // 12. Saf JavaScript QR Kod Üretici (ISO/IEC 18004 Byte Mode, V1-V10, EC M/L) & Modalı
+      const QR_SPEC_TABLE = [
+        // [version, ecBit(L=1,M=0), totalDataCW, ecPerBlock, g1Blocks, g1Data, g2Blocks, g2Data]
+        [1,  0,  16, 10, 1,  16, 0,  0],
+        [1,  1,  19,  7, 1,  19, 0,  0],
+        [2,  0,  28, 16, 1,  28, 0,  0],
+        [2,  1,  34, 10, 1,  34, 0,  0],
+        [3,  0,  44, 26, 1,  44, 0,  0],
+        [3,  1,  55, 15, 1,  55, 0,  0],
+        [4,  0,  64, 18, 2,  32, 0,  0],
+        [4,  1,  80, 20, 1,  80, 0,  0],
+        [5,  0,  86, 24, 2,  43, 0,  0],
+        [5,  1, 108, 26, 1, 108, 0,  0],
+        [6,  0, 108, 16, 4,  27, 0,  0],
+        [6,  1, 136, 18, 2,  68, 0,  0],
+        [7,  0, 124, 18, 4,  31, 0,  0],
+        [7,  1, 156, 20, 2,  78, 0,  0],
+        [8,  0, 154, 22, 2,  38, 2, 39],
+        [8,  1, 194, 24, 2,  97, 0,  0],
+        [9,  0, 182, 22, 3,  36, 2, 37],
+        [9,  1, 232, 30, 2, 116, 0,  0],
+        [10, 0, 216, 26, 4,  43, 1, 44],
+        [10, 1, 274, 18, 2,  68, 2, 69]
+      ];
+
+      const QR_ALIGN_COORDS = {
+        1: [],
+        2: [6, 18],
+        3: [6, 22],
+        4: [6, 26],
+        5: [6, 30],
+        6: [6, 34],
+        7: [6, 22, 38],
+        8: [6, 24, 42],
+        9: [6, 26, 46],
+        10: [6, 28, 50]
+      };
+
+      function qrUtf8Bytes(str) {
+        if (typeof TextEncoder !== "undefined") {
+          return Array.from(new TextEncoder().encode(str));
+        }
+        const encoded = unescape(encodeURIComponent(str));
+        const out = [];
+        for (let i = 0; i < encoded.length; i++) {
+          out.push(encoded.charCodeAt(i));
+        }
+        return out;
+      }
+
+      function qrGfMul(x, y) {
+        let r = 0;
+        for (let i = 7; i >= 0; i--) {
+          r = (r << 1) ^ ((r >>> 7) * 0x11D);
+          r ^= ((y >>> i) & 1) * x;
+        }
+        return r;
+      }
+
+      function qrRsRemainder(data, ecLen) {
+        const poly = new Uint8Array(ecLen);
+        poly[ecLen - 1] = 1;
+        let root = 1;
+        for (let i = 0; i < ecLen; i++) {
+          for (let j = 0; j < ecLen; j++) {
+            poly[j] = qrGfMul(poly[j], root);
+            if (j + 1 < ecLen) poly[j] ^= poly[j + 1];
+          }
+          root = qrGfMul(root, 2);
+        }
+
+        const rem = new Uint8Array(ecLen);
+        for (let i = 0; i < data.length; i++) {
+          const factor = data[i] ^ rem[0];
+          for (let j = 0; j < ecLen - 1; j++) rem[j] = rem[j + 1];
+          rem[ecLen - 1] = 0;
+          for (let j = 0; j < ecLen; j++) {
+            rem[j] ^= qrGfMul(poly[j], factor);
+          }
+        }
+        return rem;
+      }
+
+      function encodeQrMatrix(text) {
+        const bytes = qrUtf8Bytes(text);
+        let spec = null;
+
+        // Önce M hata düzeltme ile en küçük versiyonu seç (V1-V10), sığmazsa L'ye düş
+        for (let pass = 0; pass < 2 && !spec; pass++) {
+          const ecTarget = pass === 0 ? 0 : 1;
+          for (let i = 0; i < QR_SPEC_TABLE.length; i++) {
+            const s = QR_SPEC_TABLE[i];
+            if (s[1] !== ecTarget) continue;
+            const countBits = s[0] <= 9 ? 8 : 16;
+            const neededBits = 4 + countBits + bytes.length * 8;
+            if (neededBits <= s[2] * 8) {
+              spec = s;
+              break;
+            }
+          }
+        }
+        if (!spec) {
+          throw new Error("QR veri kapasitesi aşıldı.");
+        }
+
+        const version = spec[0];
+        const ecLevel = spec[1];
+        const totalDataCW = spec[2];
+        const ecPerBlock = spec[3];
+        const g1Blocks = spec[4];
+        const g1Data = spec[5];
+        const g2Blocks = spec[6];
+        const g2Data = spec[7];
+
+        const bits = [];
+        function pushBits(val, len) {
+          for (let i = len - 1; i >= 0; i--) bits.push((val >>> i) & 1);
+        }
+        pushBits(0b0100, 4); // Byte mode
+        pushBits(bytes.length, version <= 9 ? 8 : 16);
+        for (let i = 0; i < bytes.length; i++) pushBits(bytes[i], 8);
+
+        const dataBitsCap = totalDataCW * 8;
+        pushBits(0, Math.min(4, dataBitsCap - bits.length));
+        while (bits.length % 8 !== 0) bits.push(0);
+        const padBytes = [0xEC, 0x11];
+        let padIdx = 0;
+        while (bits.length < dataBitsCap) {
+          pushBits(padBytes[padIdx % 2], 8);
+          padIdx++;
+        }
+
+        const dataCW = new Uint8Array(totalDataCW);
+        for (let i = 0; i < totalDataCW; i++) {
+          let b = 0;
+          for (let j = 0; j < 8; j++) b = (b << 1) | bits[i * 8 + j];
+          dataCW[i] = b;
+        }
+
+        const blocks = [];
+        let offset = 0;
+        for (let i = 0; i < g1Blocks; i++) {
+          const slice = dataCW.slice(offset, offset + g1Data);
+          blocks.push({ data: slice, ec: qrRsRemainder(slice, ecPerBlock) });
+          offset += g1Data;
+        }
+        for (let i = 0; i < g2Blocks; i++) {
+          const slice = dataCW.slice(offset, offset + g2Data);
+          blocks.push({ data: slice, ec: qrRsRemainder(slice, ecPerBlock) });
+          offset += g2Data;
+        }
+
+        const allCodewords = [];
+        const maxDataLen = Math.max(g1Data, g2Data);
+        for (let i = 0; i < maxDataLen; i++) {
+          for (let b = 0; b < blocks.length; b++) {
+            if (i < blocks[b].data.length) allCodewords.push(blocks[b].data[i]);
+          }
+        }
+        for (let i = 0; i < ecPerBlock; i++) {
+          for (let b = 0; b < blocks.length; b++) {
+            allCodewords.push(blocks[b].ec[i]);
+          }
+        }
+
+        const size = 17 + 4 * version;
+        const modules = [];
+        const isFunc = [];
+        for (let r = 0; r < size; r++) {
+          modules.push(new Uint8Array(size));
+          isFunc.push(new Uint8Array(size));
+        }
+
+        function setFunc(r, c, dark) {
+          modules[r][c] = dark ? 1 : 0;
+          isFunc[r][c] = 1;
+        }
+
+        function drawFinder(r0, c0) {
+          for (let dr = -1; dr <= 7; dr++) {
+            for (let dc = -1; dc <= 7; dc++) {
+              const r = r0 + dr;
+              const c = c0 + dc;
+              if (r < 0 || r >= size || c < 0 || c >= size) continue;
+              const dist = Math.max(Math.abs(dr - 3), Math.abs(dc - 3));
+              setFunc(r, c, dist !== 2 && dist !== 4);
+            }
+          }
+        }
+
+        drawFinder(0, 0);
+        drawFinder(0, size - 7);
+        drawFinder(size - 7, 0);
+
+        for (let i = 8; i < size - 8; i++) {
+          const dark = i % 2 === 0;
+          if (!isFunc[6][i]) setFunc(6, i, dark);
+          if (!isFunc[i][6]) setFunc(i, 6, dark);
+        }
+
+        const alignPos = QR_ALIGN_COORDS[version] || [];
+        for (let i = 0; i < alignPos.length; i++) {
+          for (let j = 0; j < alignPos.length; j++) {
+            const r0 = alignPos[i];
+            const c0 = alignPos[j];
+            if ((r0 < 9 && c0 < 9) || (r0 < 9 && c0 > size - 10) || (r0 > size - 10 && c0 < 9)) continue;
+            for (let dr = -2; dr <= 2; dr++) {
+              for (let dc = -2; dc <= 2; dc++) {
+                const dist = Math.max(Math.abs(dr), Math.abs(dc));
+                setFunc(r0 + dr, c0 + dc, dist !== 1);
+              }
+            }
+          }
+        }
+
+        setFunc(size - 8, 8, true);
+        for (let i = 0; i < 9; i++) {
+          if (!isFunc[8][i]) setFunc(8, i, false);
+          if (!isFunc[i][8]) setFunc(i, 8, false);
+        }
+        for (let i = 0; i < 8; i++) {
+          if (!isFunc[8][size - 1 - i]) setFunc(8, size - 1 - i, false);
+          if (!isFunc[size - 1 - i][8]) setFunc(size - 1 - i, 8, false);
+        }
+
+        if (version >= 7) {
+          let rem = version;
+          for (let i = 0; i < 12; i++) rem = (rem << 1) ^ ((rem >>> 11) * 0x1F25);
+          const vBits = (version << 12) | rem;
+          for (let i = 0; i < 18; i++) {
+            const bit = ((vBits >>> i) & 1) === 1;
+            const a = Math.floor(i / 3);
+            const b = size - 11 + (i % 3);
+            setFunc(a, b, bit);
+            setFunc(b, a, bit);
+          }
+        }
+
+        let bitIndex = 0;
+        const totalDataBits = allCodewords.length * 8;
+        for (let right = size - 1; right >= 1; right -= 2) {
+          if (right === 6) right = 5;
+          for (let vert = 0; vert < size; vert++) {
+            for (let j = 0; j < 2; j++) {
+              const col = right - j;
+              const upward = ((right + 1) & 2) === 0;
+              const row = upward ? size - 1 - vert : vert;
+              if (!isFunc[row][col]) {
+                let dark = false;
+                if (bitIndex < totalDataBits) {
+                  const cw = allCodewords[bitIndex >>> 3];
+                  dark = ((cw >>> (7 - (bitIndex & 7))) & 1) === 1;
+                  bitIndex++;
+                }
+                modules[row][col] = dark ? 1 : 0;
+              }
+            }
+          }
+        }
+
+        function writeFormatBits(grid, maskId) {
+          const data = (ecLevel << 3) | maskId;
+          let rem = data;
+          for (let i = 0; i < 10; i++) rem = (rem << 1) ^ ((rem >>> 9) * 0x537);
+          const fmt = ((data << 10) | rem) ^ 0x5412;
+
+          for (let i = 0; i <= 5; i++) grid[i][8] = (fmt >>> i) & 1;
+          grid[7][8] = (fmt >>> 6) & 1;
+          grid[8][8] = (fmt >>> 7) & 1;
+          grid[8][7] = (fmt >>> 8) & 1;
+          for (let i = 9; i < 15; i++) grid[8][14 - i] = (fmt >>> i) & 1;
+
+          for (let i = 0; i < 8; i++) grid[8][size - 1 - i] = (fmt >>> i) & 1;
+          for (let i = 8; i < 15; i++) grid[size - 15 + i][8] = (fmt >>> i) & 1;
+        }
+
+        function isMasked(maskId, r, c) {
+          switch (maskId) {
+            case 0: return (r + c) % 2 === 0;
+            case 1: return r % 2 === 0;
+            case 2: return c % 3 === 0;
+            case 3: return (r + c) % 3 === 0;
+            case 4: return (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0;
+            case 5: return ((r * c) % 2) + ((r * c) % 3) === 0;
+            case 6: return (((r * c) % 2) + ((r * c) % 3)) % 2 === 0;
+            case 7: return (((r + c) % 2) + ((r * c) % 3)) % 2 === 0;
+            default: return false;
+          }
+        }
+
+        function computePenalty(grid) {
+          let penalty = 0;
+          for (let r = 0; r < size; r++) {
+            const g = grid[r];
+            let runColor = g[0];
+            let runLen = 1;
+            for (let c = 1; c < size; c++) {
+              if (g[c] === runColor) {
+                runLen++;
+              } else {
+                if (runLen >= 5) penalty += 3 + (runLen - 5);
+                runColor = g[c];
+                runLen = 1;
+              }
+            }
+            if (runLen >= 5) penalty += 3 + (runLen - 5);
+
+            for (let c = 0; c <= size - 11; c++) {
+              if ((g[c] === 1 && g[c+1] === 0 && g[c+2] === 1 && g[c+3] === 1 && g[c+4] === 1 && g[c+5] === 0 && g[c+6] === 1 && g[c+7] === 0 && g[c+8] === 0 && g[c+9] === 0 && g[c+10] === 0) ||
+                  (g[c] === 0 && g[c+1] === 0 && g[c+2] === 0 && g[c+3] === 0 && g[c+4] === 1 && g[c+5] === 0 && g[c+6] === 1 && g[c+7] === 1 && g[c+8] === 1 && g[c+9] === 0 && g[c+10] === 1)) {
+                penalty += 40;
+              }
+            }
+          }
+
+          for (let c = 0; c < size; c++) {
+            let runColor = grid[0][c];
+            let runLen = 1;
+            for (let r = 1; r < size; r++) {
+              if (grid[r][c] === runColor) {
+                runLen++;
+              } else {
+                if (runLen >= 5) penalty += 3 + (runLen - 5);
+                runColor = grid[r][c];
+                runLen = 1;
+              }
+            }
+            if (runLen >= 5) penalty += 3 + (runLen - 5);
+
+            for (let r = 0; r <= size - 11; r++) {
+              if ((grid[r][c] === 1 && grid[r+1][c] === 0 && grid[r+2][c] === 1 && grid[r+3][c] === 1 && grid[r+4][c] === 1 && grid[r+5][c] === 0 && grid[r+6][c] === 1 && grid[r+7][c] === 0 && grid[r+8][c] === 0 && grid[r+9][c] === 0 && grid[r+10][c] === 0) ||
+                  (grid[r][c] === 0 && grid[r+1][c] === 0 && grid[r+2][c] === 0 && grid[r+3][c] === 0 && grid[r+4][c] === 1 && grid[r+5][c] === 0 && grid[r+6][c] === 1 && grid[r+7][c] === 1 && grid[r+8][c] === 1 && grid[r+9][c] === 0 && grid[r+10][c] === 1)) {
+                penalty += 40;
+              }
+            }
+          }
+
+          for (let r = 0; r < size - 1; r++) {
+            for (let c = 0; c < size - 1; c++) {
+              const v = grid[r][c];
+              if (v === grid[r][c+1] && v === grid[r+1][c] && v === grid[r+1][c+1]) penalty += 3;
+            }
+          }
+
+          let dark = 0;
+          for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) dark += grid[r][c];
+          }
+          const total = size * size;
+          penalty += Math.floor(Math.abs(dark * 20 - total * 10) / total) * 10;
+          return penalty;
+        }
+
+        let bestPenalty = Infinity;
+        let bestGrid = null;
+        for (let mask = 0; mask < 8; mask++) {
+          const candidate = [];
+          for (let r = 0; r < size; r++) {
+            const rowCopy = new Uint8Array(size);
+            for (let c = 0; c < size; c++) {
+              rowCopy[c] = isFunc[r][c] ? modules[r][c] : (modules[r][c] ^ (isMasked(mask, r, c) ? 1 : 0));
+            }
+            candidate.push(rowCopy);
+          }
+          writeFormatBits(candidate, mask);
+          const p = computePenalty(candidate);
+          if (p < bestPenalty) {
+            bestPenalty = p;
+            bestGrid = candidate;
+          }
+        }
+
+        return { size: size, grid: bestGrid };
+      }
+
+      function resolveQrTargetUrl() {
+        const cfgIp = appConfig && typeof appConfig.pcIp === "string" ? appConfig.pcIp.trim() : "";
+        let qrIp = !isLoopbackHost(cfgIp) ? cfgIp : "";
+        if (!qrIp && lastTelemetryData && lastTelemetryData.ip_address && !isLoopbackHost(lastTelemetryData.ip_address)) {
+          qrIp = String(lastTelemetryData.ip_address).trim();
+        }
+        if (!qrIp) {
+          if (isHttp && window.location.origin && !window.location.origin.startsWith("file://") && window.location.origin !== "null") {
+            return window.location.origin + "/download/PC.apk";
+          }
+          return "";
+        }
+        const qrPort = (lastTelemetryData && lastTelemetryData.port) || (appConfig && appConfig.pcPort) || 8765;
+        return "http://" + qrIp + ":" + qrPort + "/download/PC.apk";
+      }
+
+      function resetCopyQrButtonState() {
+        if (copyQrTimer) {
+          clearTimeout(copyQrTimer);
+          copyQrTimer = null;
+        }
+        if (elBtnCopyQrUrl) elBtnCopyQrUrl.classList.remove("is-copied");
+        if (elTxtCopyQrUrl) elTxtCopyQrUrl.textContent = "Kopyala";
+      }
+
+      function generateQrSvg() {
+        const targetUrl = resolveQrTargetUrl();
+        resetCopyQrButtonState();
+
+        if (!targetUrl) {
+          elQrTargetUrl.textContent = "Bağlantı bekleniyor...";
+          elQrCodeBox.innerHTML = '<div style="font-size:12px;color:#0A0A0B;text-align:center;padding:8px;line-height:1.4;">PC IP adresi henüz belirlenmedi. Bağlantı kurulduğunda QR kod oluşturulacak.</div>';
+          return;
+        }
+
+        elQrTargetUrl.textContent = targetUrl;
+
+        try {
+          const qr = encodeQrMatrix(targetUrl);
+          const size = qr.size;
+          const grid = qr.grid;
+          const pad = 2;
+          const vb = size + pad * 2;
+          let pathData = "";
+
+          for (let r = 0; r < size; r++) {
+            let c = 0;
+            while (c < size) {
+              if (grid[r][c]) {
+                let run = 1;
+                while (c + run < size && grid[r][c + run]) run++;
+                pathData += "M" + (c + pad) + "," + (r + pad) + "h" + run + "v1h-" + run + "z";
+                c += run;
+              } else {
+                c++;
+              }
+            }
+          }
+
+          elQrCodeBox.innerHTML =
+            '<svg width="166" height="166" viewBox="0 0 ' + vb + ' ' + vb + '" shape-rendering="crispEdges" role="img" aria-label="APK İndirme QR Kodu" xmlns="http://www.w3.org/2000/svg">' +
+              '<rect width="' + vb + '" height="' + vb + '" fill="#FFFFFF"/>' +
+              '<path d="' + pathData + '" fill="#0A0A0B"/>' +
+            "</svg>";
+        } catch (err) {
+          elQrCodeBox.innerHTML = '<div style="font-size:12px;color:#0A0A0B;text-align:center;padding:8px;">QR oluşturulamadı. URL\'yi kopyalayın.</div>';
+        }
+      }
+
+      async function copyTextToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (e) {}
+        }
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.setAttribute("readonly", "");
+          ta.style.position = "fixed";
+          ta.style.top = "-9999px";
+          ta.style.left = "-9999px";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          ta.setSelectionRange(0, text.length);
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      async function handleCopyQrUrl() {
+        const url = resolveQrTargetUrl();
+        if (!url) {
+          showToast("Henüz geçerli bir indirme bağlantısı yok.", true);
+          return;
+        }
+        const copied = await copyTextToClipboard(url);
+        if (copied) {
+          triggerHaptic(30);
+          if (elBtnCopyQrUrl) elBtnCopyQrUrl.classList.add("is-copied");
+          if (elTxtCopyQrUrl) elTxtCopyQrUrl.textContent = "Kopyalandı";
+          if (copyQrTimer) clearTimeout(copyQrTimer);
+          copyQrTimer = setTimeout(resetCopyQrButtonState, 1800);
+          showToast("İndirme bağlantısı kopyalandı.");
+        } else {
+          showToast("Panoya kopyalanamadı, adresi manuel seçip kopyalayın.", true);
+        }
+      }
+
+      function closeQrModal() {
+        if (elModalQr) elModalQr.classList.remove("is-open");
+        resetCopyQrButtonState();
+      }
+
+      if (elBtnShowQr) {
+        elBtnShowQr.addEventListener("click", function () {
+          generateQrSvg();
+          elModalQr.classList.add("is-open");
+        });
+      }
+
+      if (elBtnCopyQrUrl) {
+        elBtnCopyQrUrl.addEventListener("click", handleCopyQrUrl);
+      }
+
+      if (elQrTargetUrl) {
+        elQrTargetUrl.addEventListener("click", handleCopyQrUrl);
+      }
+
+      if (elBtnCloseQr) {
+        elBtnCloseQr.addEventListener("click", closeQrModal);
+      }
+
+      elModalQr.addEventListener("click", function (e) {
+        if (e.target === elModalQr) {
+          closeQrModal();
+        }
+      });
+
+      // Escape tuşu ile açık modalları kapatma
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          closeSettings();
+          closeQrModal();
+        }
+      });
+
+      // 13. Başlatma
+      updateNetworkLabels();
+      applyDeviceNameDisplay(appConfig.customDeviceName || appConfig.lastDeviceName || "PC Kontrol", "");
+      renderInterfaceState();
+
+      pollTelemetry(true);
+      pollIntervalTimer = setInterval(function () {
+        pollTelemetry(false);
+      }, 2000);
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.visibilityState === "visible") {
+          pollTelemetry(true);
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
